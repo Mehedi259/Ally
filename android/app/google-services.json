@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "150585545366",
+    "firebase_url": "https://ally-by-avea-default-rtdb.firebaseio.com",
+    "project_id": "ally-by-avea",
+    "storage_bucket": "ally-by-avea.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150585545366:android:80e04bb1d6754a6a5028b7",
+        "android_client_info": {
+          "package_name": "com.example.exploration_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "150585545366-c57es84uac543ranrh0gl3gh2dop611h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmxO5cBcTfH8ZAQVxvKqVSp5x2GNY7s3E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "150585545366-c57es84uac543ranrh0gl3gh2dop611h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "150585545366-023rvvecsblleg87tvtsca6fsi5vqjs9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.explorationProject"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

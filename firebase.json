@@ -1,0 +1,45 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "ally-by-avea",
+          "appId": "1:150585545366:android:80e04bb1d6754a6a5028b7",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "ally-by-avea",
+          "appId": "1:150585545366:ios:26437e80f17c8ac85028b7",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "ally-by-avea",
+          "appId": "1:150585545366:ios:26437e80f17c8ac85028b7",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "ally-by-avea",
+          "configurations": {
+            "android": "1:150585545366:android:80e04bb1d6754a6a5028b7",
+            "ios": "1:150585545366:ios:26437e80f17c8ac85028b7",
+            "macos": "1:150585545366:ios:26437e80f17c8ac85028b7",
+            "web": "1:150585545366:web:79c3f779c53bbd5d5028b7",
+            "windows": "1:150585545366:web:a58b210068ec9c155028b7"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
