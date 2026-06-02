@@ -19,7 +19,7 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     // Seed bot data to Firestore on first run (no-op if already seeded)
-
+    await BotSeedData.seedToFirestoreIfEmpty();
   } catch (e) {
     print('Error initializing Firebase: $e');
     // Continue anyway - we'll show an error in the UI
@@ -186,8 +186,13 @@ class _AveaAppHomepageState extends State<AveaAppHomepage> {
       final user = ServiceLocator.authService.currentUser;
       if (user == null) return;
       final profile = await ServiceLocator.profileService.getUserProfile('dummy_token', user.uid);
-      if (profile?.selectedArchetype == null) return;
-      final archetype = await ServiceLocator.botService.getArchetype(profile!.selectedArchetype!);
+      if (profile == null) return;
+      // Support both multi-select and legacy single archetype
+      final archetypeIds = profile.selectedArchetypes.isNotEmpty
+          ? profile.selectedArchetypes
+          : (profile.selectedArchetype != null ? [profile.selectedArchetype!] : []);
+      if (archetypeIds.isEmpty) return;
+      final archetype = await ServiceLocator.botService.getArchetype(archetypeIds.first);
       if (archetype == null) return;
       await ServiceLocator.botService.activateBot(profile, archetype);
     } catch (e) {
@@ -203,14 +208,15 @@ class _AveaAppHomepageState extends State<AveaAppHomepage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-                begin: Alignment.center,
+                begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-                colors: <Color>[Color.fromARGB(255, 177, 251, 214), Color.fromARGB(255, 54, 73, 84)],
-                stops: <double>[0, .5, 1]
+                colors: <Color>[
+                  Color.fromARGB(255, 120, 80, 180),
+                  Color.fromARGB(255, 160, 126, 219),
+                ],
             ),
           ),
         ),
-
         backgroundColor: Color.fromARGB(255, 160, 126, 219)
       ),
       body: const Forum(),

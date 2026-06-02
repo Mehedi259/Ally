@@ -4,7 +4,7 @@ import 'package:exploration_project/messaging/message_service.dart';
 import 'package:exploration_project/profile/profile_service.dart';
 import 'package:exploration_project/themes/dark_purple_theme.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:flutter_beep/flutter_beep.dart';
+// import 'package:flutter_beep/flutter_beep.dart';  // Disabled due to Android namespace issues
 
 class ViewProfile extends StatefulWidget {
   final String? userId;
@@ -104,13 +104,13 @@ class _ViewProfileState extends State<ViewProfile> {
         await _panelController.close();
       }
       
-      // Play system success sound
-      try {
-        FlutterBeep.beep();
-      } catch (soundError) {
-        // Silently fail if sound can't play
-        debugPrint('Could not play sound: $soundError');
-      }
+      // Play system success sound (disabled due to package issues)
+      // try {
+      //   FlutterBeep.beep();
+      // } catch (soundError) {
+      //   // Silently fail if sound can't play
+      //   debugPrint('Could not play sound: $soundError');
+      // }
       
       // Show success banner
       setState(() {

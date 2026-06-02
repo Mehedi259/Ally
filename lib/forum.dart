@@ -114,6 +114,41 @@ class _ForumState extends State<Forum> {
     );
   }
 
+  Widget _buildGradientBanner() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            Color.fromARGB(255, 90, 50, 150),
+            Color.fromARGB(255, 140, 100, 200),
+            Color.fromARGB(255, 180, 140, 240),
+          ],
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.auto_awesome, color: Colors.white70, size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Share your goals. Inspire your community.',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13.5,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -121,6 +156,7 @@ class _ForumState extends State<Forum> {
       child: Column(
         children: [
           _buildSearchBar(),
+          _buildGradientBanner(),
           Expanded(
             child: FutureBuilder<List<ForumPost>?>(
               future: _postsFuture,

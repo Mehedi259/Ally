@@ -106,6 +106,8 @@ class BotSenderHelper {
     'boardroom_ceo': 'Boardroom CEO',
     'voice_of_enough': 'The Voice of Enough',
     'the_steward': 'The Steward',
+    'higher_self': 'Higher Self',
+    'grandmaster_of_do_nothing': 'Grandmaster of Do Nothing',
   };
 
   /// Returns the archetype display name for a bot senderId, or null if not a bot.

@@ -1,5 +1,4 @@
 
-import 'package:exploration_project/app_settings.dart';
 import 'package:flutter/material.dart';
 
 class AveaTheme{
@@ -118,19 +117,19 @@ class AveaTheme{
   }
 
   List<Color> get postTextColors => const [
-    Color.fromARGB(255,   0, 235,  48),
-    Color.fromARGB(255, 172,   4, 225),
-    Color.fromARGB(255,  37, 150, 190),
-    Color.fromARGB(255, 156, 255, 212),
-    Color.fromARGB(255, 204, 204, 255),
-    Color.fromARGB(255, 234, 255, 111),
-    Color.fromARGB(255, 255, 160, 111),
+    Color(0xFF6B3FA0),   // medium purple
+    Color(0xFF9C5B1E),   // warm amber-brown
+    Color(0xFF1F7A5C),   // muted teal-green
+    Color(0xFF8B2E59),   // deep rose
+    Color(0xFF2E5FA3),   // slate blue
+    Color(0xFF6B6B1A),   // olive gold
+    Color(0xFF3A7A3A),   // forest green
   ];
 
   /// Used in edit profile -> archetype
   Icon get archetypeIcon {
     _archetypeIcon ??= Icon(
-        Icons.smart_toy_outlined,
+        Icons.groups,
         size: 24,
         color: _iconColor
     );
@@ -214,7 +213,6 @@ class AveaTheme{
             secondaryLabelStyle: TextStyle(fontWeight: FontWeight.bold)
         )
     );
-    return _themeData!;
   }
 }
 
@@ -231,13 +229,13 @@ class AveaThemes {
   );
 
   static final AveaTheme tan = AveaTheme(
-      primarySwatch:         Color.fromARGB(255, 205, 181, 145),
-      backgroundColor:       Color.fromARGB(255, 205, 181, 145),
-      cardBackgroundColor:   Color.fromARGB(255, 249, 247, 243),
-      cardLighterBackground: Color.fromARGB(255, 249, 247, 243),
-      textColor:             Colors.black87,
-      secondaryTextColor:    Colors.black87,
-      iconColor:             Colors.black87,
+      primarySwatch:         Color.fromARGB(255, 120, 80, 180),  // purple trim
+      backgroundColor:       Color.fromARGB(255, 237, 228, 210),  // warm tan
+      cardBackgroundColor:   Color.fromARGB(255, 249, 245, 237),  // lighter cream
+      cardLighterBackground: Color.fromARGB(255, 255, 251, 244),
+      textColor:             Color(0xFF2D2035),  // deep purple-brown for readability
+      secondaryTextColor:    Color(0xFF5A4570),
+      iconColor:             Color.fromARGB(255, 120, 80, 180),  // purple icons
   );
 
 

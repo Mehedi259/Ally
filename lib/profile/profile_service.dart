@@ -26,9 +26,11 @@ class UserProfile {
   Map<String, List<Map<String, String>>> weeklyAvailability;
 
   // Bot/archetype settings
-  String? selectedArchetype; // null = no bot selected, e.g. 'calm_monk'
+  String? selectedArchetype; // legacy single archetype settings
+  List<String> selectedArchetypes; // multi-select archetype settings
   List<String> botDays;      // Days to receive messages, e.g. ['Monday', 'Wednesday']
   String? botTime;           // Time to receive message in 24h format, e.g. '09:00'
+  DateTime? lastActivityAt;  // Tracks user's last activity for auto-delay scheduling
 
   UserProfile({
     required this.id,
@@ -45,6 +47,7 @@ class UserProfile {
     this.onboarded = false,
     Map<String, List<Map<String, String>>>? weeklyAvailability,
     this.selectedArchetype,
+    List<String>? selectedArchetypes,
     List<String>? botDays,
     this.botTime,
     this.creationDate,
@@ -52,7 +55,9 @@ class UserProfile {
     this.subscriptionCancel,
     this.subscriber = false,
     this.trialEnds,
+    this.lastActivityAt,
   }) : weeklyAvailability = weeklyAvailability ?? {},
+       selectedArchetypes = selectedArchetypes ?? [],
        botDays = botDays ?? [];
 
   /// Create UserProfile from Firestore document
@@ -66,6 +71,15 @@ class UserProfile {
             .map((slot) => Map<String, String>.from(slot as Map))
             .toList();
       });
+    }
+
+    List<String> selectedArchetypes = [];
+    if (json['selectedArchetypes'] != null) {
+      selectedArchetypes = (json['selectedArchetypes'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList();
+    } else if (json['selectedArchetype'] != null) {
+      selectedArchetypes = [json['selectedArchetype'] as String];
     }
 
     return UserProfile(
@@ -85,6 +99,7 @@ class UserProfile {
       onboarded: json['onboarded'] as bool? ?? false,
       weeklyAvailability: availability,
       selectedArchetype: json['selectedArchetype'] as String?,
+      selectedArchetypes: selectedArchetypes,
       botDays: (json['botDays'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -102,6 +117,9 @@ class UserProfile {
       subscriber: json['subscriber'] as bool? ?? false,
       trialEnds: json['trialEnds'] != null
           ? DateTime.parse(json['trialEnds'] as String)
+          : null,
+      lastActivityAt: json['lastActivityAt'] != null
+          ? DateTime.parse(json['lastActivityAt'] as String)
           : null,
     );
   }
@@ -122,7 +140,8 @@ class UserProfile {
       'goalStatementCreatedAt': goalStatementCreatedAt?.toIso8601String(),
       'onboarded': onboarded,
       'weeklyAvailability': weeklyAvailability,
-      'selectedArchetype': selectedArchetype,
+      'selectedArchetype': selectedArchetypes.isNotEmpty ? selectedArchetypes.first : null,
+      'selectedArchetypes': selectedArchetypes,
       'botDays': botDays,
       'botTime': botTime,
       'creationDate': creationDate?.toIso8601String(),
@@ -130,6 +149,7 @@ class UserProfile {
       'subscriptionCancel': subscriptionCancel?.toIso8601String(),
       'subscriber': subscriber,
       'trialEnds': trialEnds?.toIso8601String(),
+      'lastActivityAt': lastActivityAt?.toIso8601String(),
     };
   }
 }

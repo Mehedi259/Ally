@@ -58,7 +58,7 @@ class _EditProfileState extends State<EditProfile> {
   };
 
   // Bot/archetype settings
-  String? _selectedArchetype;
+  List<String> _selectedArchetypes = []; // multi-select
   List<String> _botDays = [];
   String _botTime = '09:00';
   List<BotArchetype> _archetypeOptions = [];
@@ -135,7 +135,11 @@ class _EditProfileState extends State<EditProfile> {
           }
 
           // Load bot settings
-          _selectedArchetype = profile.selectedArchetype;
+          _selectedArchetypes = List<String>.from(
+            profile.selectedArchetypes.isNotEmpty
+                ? profile.selectedArchetypes
+                : (profile.selectedArchetype != null ? [profile.selectedArchetype!] : []),
+          );
           _botDays = List<String>.from(profile.botDays);
           _botTime = profile.botTime ?? '09:00';
 
@@ -187,9 +191,11 @@ class _EditProfileState extends State<EditProfile> {
         goalStatementCreatedAt: goalStatementCreatedAt,
         onboarded: true,
         weeklyAvailability: Map.from(_weeklySchedule),
-        selectedArchetype: _selectedArchetype,
+        selectedArchetypes: List<String>.from(_selectedArchetypes),
+        selectedArchetype: _selectedArchetypes.isNotEmpty ? _selectedArchetypes.first : null,
         botDays: List<String>.from(_botDays),
-        botTime: _selectedArchetype != null ? _botTime : null,
+        botTime: _selectedArchetypes.isNotEmpty ? _botTime : null,
+        lastActivityAt: DateTime.now().toUtc(),
       );
 
       await ServiceLocator.profileService.updateUserProfile('dummy_token', profile);
@@ -204,9 +210,9 @@ class _EditProfileState extends State<EditProfile> {
       }
 
       // Activate or deactivate bot
-      if (_selectedArchetype != null && _botDays.isNotEmpty) {
-        
-        final archetype = await ServiceLocator.botService.getArchetype(_selectedArchetype!);
+      if (_selectedArchetypes.isNotEmpty && _botDays.isNotEmpty) {
+        // Use the first selected archetype as the primary one
+        final archetype = await ServiceLocator.botService.getArchetype(_selectedArchetypes.first);
         if (archetype != null) {
           await ServiceLocator.botService.activateBot(profile, archetype);
         }
@@ -593,34 +599,59 @@ class _EditProfileState extends State<EditProfile> {
               ),
               SizedBox(height: 8),
               Text(
-                "Choose an archetype to receive personalized messages",
+                "Choose one or more archetypes to receive personalized messages",
               ),
-              SizedBox(height: 15),
+              SizedBox(height: 10),
 
-              // Archetype dropdown
-              DropdownButtonFormField<String?>(
-                decoration: InputDecoration(
-                  labelText: "Archetype",
-                  border: OutlineInputBorder(),
-                ),
-                value: _selectedArchetype,
-                items: [
-                  DropdownMenuItem<String?>(value: null, child: Text("None")),
-                  ..._archetypeOptions.map((archetype) => DropdownMenuItem<String?>(
-                        value: archetype.id,
-                        child: Text(archetype.displayName),
-                      )),
+              // Select All / Clear All row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedArchetypes = _archetypeOptions.map((a) => a.id).toList();
+                      });
+                    },
+                    child: Text('Select All'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedArchetypes = [];
+                        _botDays = [];
+                      });
+                    },
+                    child: Text('Clear All'),
+                  ),
                 ],
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedArchetype = newValue;
-                    if (newValue == null) _botDays = [];
-                  });
-                },
               ),
 
-              // Days and time — only shown when an archetype is selected
-              if (_selectedArchetype != null) ...[
+              // Multi-select Wrap of FilterChips
+              Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: _archetypeOptions.map((archetype) {
+                  final selected = _selectedArchetypes.contains(archetype.id);
+                  return FilterChip(
+                    label: Text(archetype.displayName),
+                    selected: selected,
+                    onSelected: (bool value) {
+                      setState(() {
+                        if (value) {
+                          _selectedArchetypes.add(archetype.id);
+                        } else {
+                          _selectedArchetypes.remove(archetype.id);
+                          if (_selectedArchetypes.isEmpty) _botDays = [];
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+
+              // Days and time — only shown when at least one archetype is selected
+              if (_selectedArchetypes.isNotEmpty) ...[
                 SizedBox(height: 20),
                 Text(
                   "Receive messages on:",

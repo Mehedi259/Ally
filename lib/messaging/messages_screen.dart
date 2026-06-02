@@ -6,7 +6,7 @@ import 'package:exploration_project/bots/bot_service.dart';
 import 'package:exploration_project/service_locator.dart';
 import 'package:exploration_project/profile/profile_service.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:flutter_beep/flutter_beep.dart';
+// import 'package:flutter_beep/flutter_beep.dart';  // Disabled due to Android namespace issues
 import 'message_service.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -428,12 +428,12 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
         await _panelController.close();
       }
 
-      // Play system success sound
-      try {
-        FlutterBeep.beep();
-      } catch (soundError) {
-        debugPrint('Could not play sound: $soundError');
-      }
+      // Play system success sound (disabled due to package issues)
+      // try {
+      //   FlutterBeep.beep();
+      // } catch (soundError) {
+      //   debugPrint('Could not play sound: $soundError');
+      // }
 
       // Show success banner
       setState(() {
@@ -517,6 +517,27 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
     }
   }
 
+  // Whether this message is from a bot archetype (no reply allowed)
+  bool get _isBotMessage => BotSenderHelper.isBotSenderId(widget.message.senderId);
+
+  Widget _buildBodyForReceived() {
+    if (_isBotMessage) {
+      // For bot messages: no reply panel, just the content
+      return _buildMessageContent();
+    }
+    return SlidingUpPanel(
+      controller: _panelController,
+      minHeight: 0,
+      maxHeight: MediaQuery.of(context).size.height * 0.7,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(24),
+        topRight: Radius.circular(24),
+      ),
+      panel: _buildReplyPanel(),
+      body: _buildMessageContent(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -528,19 +549,9 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
       ),
       body: Stack(
         children: [
-          // Main content with SlidingUpPanel (for all received messages)
+          // Main content with SlidingUpPanel (only for non-bot received messages)
           if (!widget.isSentMessage)
-            SlidingUpPanel(
-              controller: _panelController,
-              minHeight: 0,
-              maxHeight: MediaQuery.of(context).size.height * 0.7,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
-              ),
-              panel: _buildReplyPanel(),
-              body: _buildMessageContent(),
-            )
+            _buildBodyForReceived()
           else
             _buildMessageContent(),
           // Success Banner
@@ -570,8 +581,8 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
             ),
         ],
       ),
-      // Reply FAB (only for received messages)
-      floatingActionButton: !widget.isSentMessage
+      // Reply FAB (only for non-bot received messages)
+      floatingActionButton: (!widget.isSentMessage && !_isBotMessage)
           ? FloatingActionButton.extended(
               onPressed: () => _panelController.open(),
               backgroundColor: AveaThemes.current().primarySwatch,
