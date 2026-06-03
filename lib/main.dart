@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "Ally by Avea",
+      debugShowCheckedModeBanner: false, // Remove debug banner
       theme: AveaThemes.current().themeData,
       home: StreamBuilder(
         stream: ServiceLocator.authService.authStateChanges,
