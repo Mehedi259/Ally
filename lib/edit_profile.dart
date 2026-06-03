@@ -36,7 +36,7 @@ class _EditProfileState extends State<EditProfile> {
   // Gender options
   final List<String> _genderOptions = ['Unknown', 'Male', 'Female'];
 
-  // US Timezone options
+  // Timezone options (US + Bangladesh)
   final List<String> _timezoneOptions = [
     'US/Eastern',
     'US/Central',
@@ -44,6 +44,7 @@ class _EditProfileState extends State<EditProfile> {
     'US/Pacific',
     'US/Alaska',
     'US/Hawaii',
+    'Asia/Dhaka', // Bangladesh timezone
   ];
 
   // Schedule state for each day

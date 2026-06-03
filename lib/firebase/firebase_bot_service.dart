@@ -135,6 +135,7 @@ class FirebaseBotService implements IBotService {
     'US/Pacific': 'America/Los_Angeles',
     'US/Alaska': 'America/Anchorage',
     'US/Hawaii': 'Pacific/Honolulu',
+    'Asia/Dhaka': 'Asia/Dhaka', // Bangladesh timezone
   };
 
   static const Map<String, int> _dayToWeekday = {
@@ -159,7 +160,7 @@ class FirebaseBotService implements IBotService {
     final hour = int.parse(timeParts[0]);
     final minute = int.parse(timeParts[1]);
 
-    final ianaTimezone = _timezoneMap[profile.timezone] ?? 'America/Los_Angeles';
+    final ianaTimezone = _timezoneMap[profile.timezone] ?? profile.timezone ?? 'America/Los_Angeles';
     final location = tz.getLocation(ianaTimezone);
 
     final selectedWeekdays = profile.botDays

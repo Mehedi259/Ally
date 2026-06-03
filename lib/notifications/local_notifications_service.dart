@@ -78,6 +78,25 @@ class LocalNotificationsService {
 
     print("Local notifications initialized successfully: $initialized");
 
+    // Request exact alarm permission on Android 12+ (API 31+)
+    if (!kIsWeb && Platform.isAndroid) {
+      final androidPlugin = _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      
+      if (androidPlugin != null) {
+        // Request exact alarm permission (Android 12+)
+        final canScheduleExactAlarms = await androidPlugin.canScheduleExactNotifications();
+        print("Can schedule exact alarms: $canScheduleExactAlarms");
+        
+        if (canScheduleExactAlarms == false) {
+          // Request permission
+          final permissionGranted = await androidPlugin.requestExactAlarmsPermission();
+          print("Exact alarms permission requested. Granted: $permissionGranted");
+        }
+      }
+    }
+
     if (!kIsWeb && Platform.isIOS) {
       final iosPlugin = _flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
