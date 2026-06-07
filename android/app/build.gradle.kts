@@ -33,10 +33,15 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {
         release {
+            proguardFiles(
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguard-rules.pro"
+            )
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
@@ -51,4 +56,6 @@ flutter {
 dependencies {
     // Required for flutter_local_notifications (minimum 2.1.4)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    // Multidex support for release builds
+    implementation("androidx.multidex:multidex:2.0.1")
 }
