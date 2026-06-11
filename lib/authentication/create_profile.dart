@@ -265,7 +265,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 6, top: 2),
                   child: Text(
-                    'Step ${widget.currentStep + 1} of 3',
+                    'Step ${widget.currentStep + 1} of 4',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 13,
@@ -274,7 +274,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   ),
                 ),
                 LinearProgressIndicator(
-                  value: (widget.currentStep + 1) / 3,
+                  value: (widget.currentStep + 1) / 4,
                   backgroundColor: AveaThemes.current().primarySwatch.withOpacity(0.3),
                   valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                   minHeight: 3,

@@ -151,4 +151,32 @@ class FirebaseMessageService implements IMessageService {
       return [];
     }
   }
+
+  /// Deletes messages older than 7 days
+  /// This should be called periodically (e.g., on app start or daily)
+  Future<void> deleteOldMessages() async {
+    try {
+      final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7));
+      
+      final snapshot = await _firestore
+          .collection(_collection)
+          .where('sentAt', isLessThan: sevenDaysAgo.toIso8601String())
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        print('No old messages to delete.');
+        return;
+      }
+
+      final batch = _firestore.batch();
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      
+      await batch.commit();
+      print('Deleted ${snapshot.docs.length} messages older than 7 days.');
+    } catch (e) {
+      print('Error deleting old messages: $e');
+    }
+  }
 }

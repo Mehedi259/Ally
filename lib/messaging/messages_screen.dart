@@ -364,7 +364,7 @@ class MessageDetailScreen extends StatefulWidget {
 class _MessageDetailScreenState extends State<MessageDetailScreen> {
   final TextEditingController _replyController = TextEditingController();
   final PanelController _panelController = PanelController();
-  final int _maxCharacters = 200;
+  final int _maxCharacters = 150;
   bool _isSending = false;
   UserMessageQuota? _userQuota;
   bool _showSuccessBanner = false;
@@ -641,7 +641,7 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
                   const SizedBox(height: 8),
                   // Subtitle
                   Text(
-                    'Replying to ${widget.senderName} (200 character limit)',
+                    'Replying to ${widget.senderName} (150 character limit)',
                     style: TextStyle(
                       fontSize: 14,
                       color: AveaThemes.current().secondaryTextColor,

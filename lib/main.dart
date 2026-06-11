@@ -9,6 +9,7 @@ import 'authentication/login.dart';
 import 'authentication/onboarding_flow.dart';
 import 'bots/bot_seed_data.dart';
 import 'service_locator.dart';
+import 'firebase/firebase_message_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,16 @@ void main() async {
     );
     // Seed bot data to Firestore on first run (no-op if already seeded)
     await BotSeedData.seedToFirestoreIfEmpty();
+    
+    // Delete messages older than 7 days on app startup
+    try {
+      final messageService = ServiceLocator.messageService;
+      if (messageService is FirebaseMessageService) {
+        await messageService.deleteOldMessages();
+      }
+    } catch (e) {
+      print('Error deleting old messages: $e');
+    }
   } catch (e) {
     print('Error initializing Firebase: $e');
     // Continue anyway - we'll show an error in the UI
