@@ -16,10 +16,10 @@ class MessagesScreen extends StatefulWidget {
   State<MessagesScreen> createState() => _MessagesScreenState();
 }
 
-class _MessagesScreenState extends State<MessagesScreen> {
+class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProviderStateMixin {
   static const _autoRefreshInterval = Duration(seconds: 30);
   
-  bool _showingSent = false;
+  late TabController _tabController;
   List<Message> _messages = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -31,6 +31,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_onTabChanged);
     _loadMessages();
     _startAutoRefresh();
   }
@@ -38,7 +40,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   void dispose() {
     _autoRefreshTimer?.cancel();
+    _tabController.removeListener(_onTabChanged);
+    _tabController.dispose();
     super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (!_tabController.indexIsChanging) {
+      _loadMessages();
+    }
   }
 
   void _startAutoRefresh() {
@@ -67,12 +77,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
       }
 
       final messageService = ServiceLocator.messageService;
-      final messages = _showingSent
+      final showingSent = _tabController.index == 1;
+      final messages = showingSent
           ? await messageService.getSentMessages('token', user.uid)
           : await messageService.getReceivedMessages('token', user.uid);
 
       // Pre-fetch profiles for all senders/recipients
-      final userIds = _showingSent
+      final userIds = showingSent
           ? messages.map((m) => m.recipientId).toSet()
           : messages.map((m) => m.senderId).toSet();
 
@@ -100,13 +111,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
         _isLoading = false;
       });
     }
-  }
-
-  void _toggleView() {
-    setState(() {
-      _showingSent = !_showingSent;
-    });
-    _loadMessages();
   }
 
   String _getUserName(String userId) {
@@ -152,6 +156,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }
 
   void _openMessageDetail(Message message) async {
+    final showingSent = _tabController.index == 1;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -159,7 +164,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           message: message,
           senderName:   _getUserName(message.senderId),
           recipientName: _getUserName(message.recipientId),
-          isSentMessage: _showingSent,
+          isSentMessage: showingSent,
         ),
       ),
     ).then((_) => _loadMessages()); // Refresh after returning
@@ -169,19 +174,43 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_showingSent ? 'Sent Messages' : 'Received Messages'),
+        title: const Text('Messages'),
         backgroundColor: AveaThemes.current().primarySwatch,
-        actions: [
-          IconButton(
-            icon: Icon(_showingSent ? Icons.inbox : Icons.outbox),
-            tooltip: _showingSent ? 'View Received' : 'View Sent',
-            onPressed: _toggleView,
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          indicatorWeight: 3,
+          labelColor: Colors.white,
+          labelStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
-        ],
+          unselectedLabelColor: Colors.white70,
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
+          ),
+          tabs: const [
+            Tab(
+              icon: Icon(Icons.inbox),
+              text: 'Received',
+            ),
+            Tab(
+              icon: Icon(Icons.outbox),
+              text: 'Sent',
+            ),
+          ],
+        ),
       ),
       body: Container(
         color: AveaThemes.current().backgroundColor,
-        child: _buildBody(),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildBody(), // Received messages
+            _buildBody(), // Sent messages
+          ],
+        ),
       ),
     );
   }
@@ -231,6 +260,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
     }
 
     if (_messages.isEmpty) {
+      final showingSent = _tabController.index == 1;
       return RefreshIndicator(
         onRefresh: _loadMessages,
         child: ListView(
@@ -242,13 +272,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    _showingSent ? Icons.outbox : Icons.inbox,
+                    showingSent ? Icons.outbox : Icons.inbox,
                     size: 64,
                     color: AveaThemes.current().secondaryTextColor,
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _showingSent ? 'No sent messages' : 'No messages received',
+                    showingSent ? 'No sent messages' : 'No messages received',
                     style:TextStyle(
                       color: AveaThemes.current().textColor,
                       fontSize: 18,
@@ -256,7 +286,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    _showingSent
+                    showingSent
                         ? 'Messages you send will appear here'
                         : 'Messages sent to you will appear here',
                     style: TextStyle(color: AveaThemes.current().secondaryTextColor),
@@ -282,7 +312,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
         separatorBuilder: (context, index) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final message = _messages[index];
-          final otherUserId = _showingSent ? message.recipientId : message.senderId;
+          final showingSent = _tabController.index == 1;
+          final otherUserId = showingSent ? message.recipientId : message.senderId;
           final otherUserName = _getUserName(otherUserId);
 
           return GestureDetector(
@@ -302,13 +333,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       Row(
                         children: [
                           Icon(
-                            _showingSent ? Icons.arrow_upward : Icons.arrow_downward,
+                            showingSent ? Icons.arrow_upward : Icons.arrow_downward,
                             size: 16,
-                            color: _showingSent ? Colors.orange : Colors.green,
+                            color: showingSent ? Colors.orange : Colors.green,
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            _showingSent ? 'To: $otherUserName' : 'From: $otherUserName',
+                            showingSent ? 'To: $otherUserName' : 'From: $otherUserName',
                             style: TextStyle(
                               color: AveaThemes.current().textColor,
                               fontWeight: FontWeight.bold,
