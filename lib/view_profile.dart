@@ -566,11 +566,7 @@ class _ViewProfileState extends State<ViewProfile> {
                             CircleAvatar(
                               radius: 45,
                               backgroundColor: Colors.white,
-                              child: Icon(
-                                Icons.person,
-                                size: 50,
-                                color: const Color.fromARGB(255, 160, 126, 219),
-                              ),
+                              backgroundImage: AssetImage('assets/icons/app_icon.png'),
                             ),
                             SizedBox(height: 15),
                             // Name

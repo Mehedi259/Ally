@@ -374,16 +374,7 @@ class GoalPostCard extends StatelessWidget {
                     radius: 20,
                     backgroundColor:
                         AveaThemes.current().primarySwatch.withValues(alpha: 0.2),
-                    child: Text(
-                      post.userName.isNotEmpty
-                          ? post.userName[0].toUpperCase()
-                          : '?',
-                      style: TextStyle(
-                        color: AveaThemes.current().primarySwatch,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
+                    backgroundImage: AssetImage('assets/icons/app_icon.png'),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
