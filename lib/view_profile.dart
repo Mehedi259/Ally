@@ -18,8 +18,9 @@ class ViewProfile extends StatefulWidget {
 
 class _ViewProfileState extends State<ViewProfile> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _textFieldScrollController = ScrollController();
   final PanelController _panelController = PanelController();
-  final int _maxCharacters = 200;
+  final int _maxCharacters = 150;
   bool _isSending = false;
   UserMessageQuota? _userQuota;
   bool _showSuccessBanner = false;
@@ -186,6 +187,7 @@ class _ViewProfileState extends State<ViewProfile> {
   @override
   void dispose() {
     _messageController.dispose();
+    _textFieldScrollController.dispose();
     super.dispose();
   }
 
@@ -380,7 +382,7 @@ class _ViewProfileState extends State<ViewProfile> {
                   
                   // Subtitle
                   Text(
-                    "Messages are for scheduling only (200 character limit)",
+                    "Messages are for scheduling only (150 character limit)",
                     style: TextStyle(
                       fontSize: 14,
                       color: AveaThemes.current().secondaryTextColor,
@@ -436,8 +438,11 @@ class _ViewProfileState extends State<ViewProfile> {
                   // Message Input
                   TextField(
                     controller: _messageController,
+                    scrollController: _textFieldScrollController,
                     maxLength: _maxCharacters,
-                    maxLines: 1,
+                    minLines: 3,
+                    maxLines: 6,
+                    textAlignVertical: TextAlignVertical.top,
                     style: TextStyle(color: AveaThemes.current().textColor),
                     decoration: InputDecoration(
                       hintText: "Type your message here...",
@@ -449,6 +454,10 @@ class _ViewProfileState extends State<ViewProfile> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
                       ),
                       counterText: "$remainingChars characters remaining",
                       counterStyle: TextStyle(

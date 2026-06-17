@@ -330,8 +330,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   Text(
                     message.content,
                     style: TextStyle(color: AveaThemes.current().textColor),
-                    maxLines: 2,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
+                    softWrap: true,
                   ),
                 ],
               ),
@@ -363,6 +364,7 @@ class MessageDetailScreen extends StatefulWidget {
 
 class _MessageDetailScreenState extends State<MessageDetailScreen> {
   final TextEditingController _replyController = TextEditingController();
+  final ScrollController _textFieldScrollController = ScrollController();
   final PanelController _panelController = PanelController();
   final int _maxCharacters = 150;
   bool _isSending = false;
@@ -378,6 +380,7 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
   @override
   void dispose() {
     _replyController.dispose();
+    _textFieldScrollController.dispose();
     super.dispose();
   }
 
@@ -695,9 +698,11 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
                   // Message Input
                   TextField(
                     controller: _replyController,
+                    scrollController: _textFieldScrollController,
                     maxLength: _maxCharacters,
-                    minLines: 1,
-                    maxLines: null,
+                    minLines: 3,
+                    maxLines: 6,
+                    textAlignVertical: TextAlignVertical.top,
                     style: TextStyle(color: AveaThemes.current().textColor),
                     decoration: InputDecoration(
                       hintText: 'Type your reply here...',
@@ -709,6 +714,10 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
                       ),
                       counterText: '$remainingChars characters remaining',
                       counterStyle: TextStyle(
@@ -845,6 +854,8 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
                   fontSize: 16,
                   height: 1.5,
                 ),
+                softWrap: true,
+                overflow: TextOverflow.visible,
               ),
             ),
             // Add padding at bottom for FAB visibility
