@@ -154,7 +154,7 @@ class _WelcomeStep extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
-                      "🌟 Welcome to Ally by Avea!",
+                      "Welcome to Ally by Avea!",
                       style: TextStyle(
                         fontSize: 24, 
                         fontWeight: FontWeight.bold,
@@ -201,7 +201,7 @@ class _WelcomeStep extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
-                      "🔑  Why Ally by Avea Works",
+                      "Why Ally by Avea Works",
                       style: TextStyle(
                         fontSize: 24, 
                         fontWeight: FontWeight.bold,
@@ -231,7 +231,7 @@ class _WelcomeStep extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
-                      "⚡ The Creation Formula",
+                      "The Creation Formula",
                       style: TextStyle(
                         fontSize: 24, 
                         fontWeight: FontWeight.bold,
@@ -261,7 +261,7 @@ class _WelcomeStep extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
-                      "🧠 The Mastermind Principle",
+                      "The Mastermind Principle",
                       style: TextStyle(
                         fontSize: 24, 
                         fontWeight: FontWeight.bold,
@@ -387,7 +387,7 @@ class _InstructionsStep extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
-                    "🤝 How It Works",
+                    "How It Works",
                     style: TextStyle(
                       fontSize: 20, 
                       fontWeight: FontWeight.bold,
@@ -428,7 +428,7 @@ class _InstructionsStep extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
-                    "🗂 Forum-Based Matching",
+                    "Forum-Based Matching",
                     style: TextStyle(
                       fontSize: 20, 
                       fontWeight: FontWeight.bold,
@@ -460,7 +460,7 @@ class _InstructionsStep extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
-                    "💬 Messaging",
+                    "Messaging",
                     style: TextStyle(
                       fontSize: 20, 
                       fontWeight: FontWeight.bold,
@@ -495,7 +495,7 @@ class _InstructionsStep extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
-                    "📝 Getting Started",
+                    "Getting Started",
                     style: TextStyle(
                       fontSize: 20, 
                       fontWeight: FontWeight.bold,

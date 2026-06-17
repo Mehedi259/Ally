@@ -30,7 +30,7 @@ class Welcome extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "🌟 Welcome to Ally by Avea!",
+                    "Welcome to Ally by Avea!",
                     style: TextStyle(
                       fontSize: 24, 
                       fontWeight: FontWeight.bold,
@@ -76,7 +76,7 @@ class Welcome extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "🔑  Why Ally by Avea Works",
+                    "Why Ally by Avea Works",
                     style: TextStyle(
                       fontSize: 24, 
                       fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class Welcome extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "⚡ The Creation Formula",
+                    "The Creation Formula",
                     style: TextStyle(
                       fontSize: 24, 
                       fontWeight: FontWeight.bold,
@@ -134,7 +134,7 @@ class Welcome extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "🧠 The Mastermind Principle",
+                    "The Mastermind Principle",
                     style: TextStyle(
                       fontSize: 24, 
                       fontWeight: FontWeight.bold,

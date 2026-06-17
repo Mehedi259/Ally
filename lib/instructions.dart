@@ -21,7 +21,7 @@ class Instructions extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "🤝 How It Works",
+                "How It Works",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 12),
@@ -41,7 +41,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "🗂 Forum-Based Matching",
+                "Forum-Based Matching",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 8),
@@ -57,7 +57,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "🧭 Archetype Daily Guidance",
+                "Archetype Daily Guidance",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 8),
@@ -68,7 +68,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 12),
               
               Text(
-                "✨ What Are Archetype Daily Guidance Messages?",
+                "What Are Archetype Daily Guidance Messages?",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.textColor),
               ),
               const SizedBox(height: 8),
@@ -83,7 +83,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 12),
 
               Text(
-                "🎭 Choose Your Guidance Archetype",
+                "Choose Your Guidance Archetype",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.textColor),
               ),
               const SizedBox(height: 8),
@@ -124,7 +124,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "💬 Messaging",
+                "Messaging",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 8),
@@ -158,7 +158,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "📝 Getting Started",
+                "Getting Started",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 12),
@@ -209,7 +209,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "🎯 Apply the Formula",
+                "Apply the Formula",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 8),
@@ -262,7 +262,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "💡 The Power of Consistency",
+                "The Power of Consistency",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 8),
@@ -280,7 +280,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "🚦 Rules & Respect",
+                "Rules & Respect",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 8),
@@ -298,16 +298,15 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "🔗 Need Help Finding a Partner?",
+                "Need Help Finding a Partner?",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 8),
               Text(
                 "Connect with Avea—Expert Accountability Partner, Life Coach & Psychic\n\n"
-                "📧 Email: amylwilhelm@gmail.com\n"
-                "🛍️ Fiverr: fiverr.com/sellers/aqua_wise\n"
-                "🔮 Etsy: AskAveaTarot\n"
-                "🌐 MysticSense: mysticsense.com/psychics/avea/",
+                "Email: amylwilhelm@gmail.com\n"
+                "Fiverr: fiverr.com/sellers/aqua_wise\n"
+                "Etsy: AskAveaTarot",
                 style: TextStyle(fontSize: 15, color: theme.textColor, height: 1.6),
               ),
               const SizedBox(height: 16),
@@ -316,7 +315,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "💌 Subscription Options",
+                "Subscription Options",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 8),
@@ -336,7 +335,7 @@ class Instructions extends StatelessWidget {
               const SizedBox(height: 16),
 
               Text(
-                "🌈 Final Thought",
+                "Final Thought",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textColor),
               ),
               const SizedBox(height: 8),
