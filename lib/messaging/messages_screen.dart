@@ -180,7 +180,7 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
             // Gradient Header with Background Image
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.only(top: 40, bottom: 50),
+              padding: const EdgeInsets.only(top: 40, bottom: 110),
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/message banner.png'),
