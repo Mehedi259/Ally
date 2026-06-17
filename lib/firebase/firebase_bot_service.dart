@@ -37,12 +37,22 @@ class FirebaseBotService implements IBotService {
   @override
   Future<void> activateBot(dynamic profile, BotArchetype archetype) async {
     final p = profile as UserProfile;
-    if (p.botDays.isEmpty || p.botTime == null) return;
+
+    print('🤖 activateBot called for user: ${p.id}');
+    print('   botDays: ${p.botDays}');
+    print('   botTime: ${p.botTime}');
+
+    // Removed the requirement for botDays and botTime to be set
+    // since the new logic schedules immediately and then every 72 hours.
+
+    print('   ✅ Bot activation proceeding...');
 
     // Resolve the full list of selected archetype IDs (prefer multi-select, fall back to legacy single)
     final List<String> archetypeIds = p.selectedArchetypes.isNotEmpty
         ? p.selectedArchetypes
-        : (p.selectedArchetype != null ? [p.selectedArchetype!] : [archetype.id]);
+        : (p.selectedArchetype != null
+              ? [p.selectedArchetype!]
+              : [archetype.id]);
 
     // Fetch all selected archetypes' messages
     List<String> combinedMessages = [];
@@ -68,17 +78,34 @@ class FirebaseBotService implements IBotService {
     final delayHours = _computeDelayHours(p.lastActivityAt);
 
     // Generate the schedule with the delay
-    final schedule = _buildSchedule(p, combinedMessages, delayHours: delayHours);
-    if (schedule.isEmpty) return;
+    final schedule = _buildSchedule(
+      p,
+      combinedMessages,
+      delayHours: delayHours,
+    );
+    if (schedule.isEmpty) {
+      print('   ⚠️ Schedule is empty, no messages will be sent');
+      return;
+    }
+
+    print('   📅 Generated ${schedule.length} scheduled messages');
+    print('   📅 First message at: ${schedule.first.scheduledAt}');
+    if (schedule.length > 1) {
+      print('   📅 Second message at: ${schedule[1].scheduledAt}');
+    }
 
     // Schedule local notifications
     await ServiceLocator.localNotificationsService.scheduleBotNotifications(
-      schedule.map((e) => (
-        id: e.id,
-        scheduledAt: e.scheduledAt,
-        title: _buildDisplayName(archetypeIds),
-        body: e.message,
-      )).toList(),
+      schedule
+          .map(
+            (e) => (
+              id: e.id,
+              scheduledAt: e.scheduledAt,
+              title: _buildDisplayName(archetypeIds),
+              body: e.message,
+            ),
+          )
+          .toList(),
     );
 
     // Write messages to Firestore so they appear in the inbox at delivery time
@@ -89,10 +116,11 @@ class FirebaseBotService implements IBotService {
     await ServiceLocator.messageService.writeBotMessages(
       botSenderId,
       p.id,
-      schedule.map((e) => (
-        scheduledAt: e.scheduledAt.toLocal(),
-        content: e.message,
-      )).toList(),
+      schedule
+          .map(
+            (e) => (scheduledAt: e.scheduledAt.toLocal(), content: e.message),
+          )
+          .toList(),
     );
   }
 
@@ -108,23 +136,19 @@ class FirebaseBotService implements IBotService {
   String _buildDisplayName(List<String> archetypeIds) {
     if (archetypeIds.length == 1) {
       return BotSenderHelper.displayNameForSenderId(
-              BotSenderHelper.senderIdForArchetype(archetypeIds.first)) ??
+            BotSenderHelper.senderIdForArchetype(archetypeIds.first),
+          ) ??
           'Your Ally Bot';
     }
     return 'Your Ally Bot';
   }
 
   /// Computes the hours to delay the first message based on user's last
-  /// activity. If `lastActivityAt` was within the last 72 hours, we delay
-  /// until 72h after that timestamp. Otherwise, no delay.
+  /// activity.
+  /// NEW LOGIC: First message is immediate (0 delay), subsequent messages
+  /// will be scheduled with 72-hour gaps in _buildSchedule.
   int _computeDelayHours(DateTime? lastActivityAt) {
-    if (lastActivityAt == null) return 0;
-    final now = DateTime.now().toUtc();
-    final lastActivity = lastActivityAt.toUtc();
-    final hoursSinceActivity = now.difference(lastActivity).inHours;
-    if (hoursSinceActivity < 72) {
-      return (72 - hoursSinceActivity).clamp(0, 72);
-    }
+    // Always return 0 so first message comes immediately
     return 0;
   }
 
@@ -156,48 +180,40 @@ class FirebaseBotService implements IBotService {
     List<String> messages, {
     int delayHours = 0,
   }) {
-    final timeParts = profile.botTime!.split(':');
-    final hour = int.parse(timeParts[0]);
-    final minute = int.parse(timeParts[1]);
-
-    final ianaTimezone = _timezoneMap[profile.timezone] ?? profile.timezone ?? 'America/Los_Angeles';
+    final ianaTimezone =
+        _timezoneMap[profile.timezone] ??
+        profile.timezone ??
+        'America/Los_Angeles';
     final location = tz.getLocation(ianaTimezone);
 
-    final selectedWeekdays = profile.botDays
-        .map((day) => _dayToWeekday[day])
-        .whereType<int>()
-        .toSet();
-
-    // Apply 72h delay: shift "now" forward by delayHours so the first
-    // scheduled slot is after the delay window.
     final now = tz.TZDateTime.now(location);
-    final effectiveNow = delayHours > 0
-        ? now.add(Duration(hours: delayHours))
-        : now;
-
-    final today = tz.TZDateTime(location, effectiveNow.year, effectiveNow.month, effectiveNow.day);
-    var cursor = today.subtract(const Duration(days: 1));
-    int count = 0;
-    int messageIndex = 0;
 
     final result = <({int id, tz.TZDateTime scheduledAt, String message})>[];
+    int messageIndex = 0;
 
-    while (count < _maxNotifications) {
-      cursor = cursor.add(const Duration(days: 1));
-      if (!selectedWeekdays.contains(cursor.weekday)) continue;
+    // First message: schedule immediately (within next few seconds)
+    result.add((
+      id: _botNotificationBaseId,
+      scheduledAt: now.add(const Duration(seconds: 5)), // 5 seconds from now
+      message: messages[messageIndex % messages.length],
+    ));
+    messageIndex++;
 
-      final scheduledTime = tz.TZDateTime(
-        location, cursor.year, cursor.month, cursor.day, hour, minute,
-      );
-      if (scheduledTime.isBefore(effectiveNow)) continue;
+    // Subsequent messages: schedule 72 hours apart
+    var nextScheduledTime = now.add(const Duration(hours: 72));
+    int count = 1;
 
+    while (count < _maxNotifications && messageIndex < messages.length * 10) {
+      // Allow message repetition
       result.add((
         id: _botNotificationBaseId + count,
-        scheduledAt: scheduledTime,
+        scheduledAt: nextScheduledTime,
         message: messages[messageIndex % messages.length],
       ));
+
       messageIndex++;
       count++;
+      nextScheduledTime = nextScheduledTime.add(const Duration(hours: 72));
     }
 
     return result;

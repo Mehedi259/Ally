@@ -199,13 +199,33 @@ class _AveaAppHomepageState extends State<AveaAppHomepage> {
       if (user == null) return;
       final profile = await ServiceLocator.profileService.getUserProfile('dummy_token', user.uid);
       if (profile == null) return;
+      
+      print('🔄 Rescheduling bot for user: ${user.uid}');
+      
       // Support both multi-select and legacy single archetype
       final archetypeIds = profile.selectedArchetypes.isNotEmpty
           ? profile.selectedArchetypes
           : (profile.selectedArchetype != null ? [profile.selectedArchetype!] : []);
-      if (archetypeIds.isEmpty) return;
+      
+      if (archetypeIds.isEmpty) {
+        print('   ⚠️ No archetype selected, fetching all archetypes...');
+        // If no archetype selected, use the first available one for testing
+        final allArchetypes = await ServiceLocator.botService.getAllArchetypes();
+        if (allArchetypes.isEmpty) {
+          print('   ❌ No archetypes available');
+          return;
+        }
+        print('   ✅ Using first available archetype: ${allArchetypes.first.displayName}');
+        await ServiceLocator.botService.activateBot(profile, allArchetypes.first);
+        return;
+      }
+      
       final archetype = await ServiceLocator.botService.getArchetype(archetypeIds.first);
-      if (archetype == null) return;
+      if (archetype == null) {
+        print('   ❌ Archetype not found: ${archetypeIds.first}');
+        return;
+      }
+      print('   ✅ Activating bot with archetype: ${archetype.displayName}');
       await ServiceLocator.botService.activateBot(profile, archetype);
     } catch (e) {
       print('Error rescheduling bot: $e');
