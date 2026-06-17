@@ -47,10 +47,57 @@ class _ForumState extends State<Forum> {
     await _postsFuture;
   }
 
+  Widget _buildSkeletonList() {
+    return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      itemCount: 6,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              _SkeletonBar(width: double.infinity, height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildGradientHeader() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 50),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF2C3E50), // Dark blue
+            Color(0xFF3498DB), // Blue  
+            Color(0xFF48C9B0), // Aquamarine/Cyan
+          ],
+        ),
+      ),
+      child: const Text(
+        'Forum',
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 56,
+          fontWeight: FontWeight.bold,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   Widget _buildSearchBar() {
     return Container(
-      color: AveaThemes.current().primarySwatch,
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+      color: Colors.black,
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       child: TextField(
         controller: _searchController,
         focusNode: _searchFocusNode,
@@ -67,7 +114,7 @@ class _ForumState extends State<Forum> {
                 )
               : null,
           filled: true,
-          fillColor: Colors.white.withValues(alpha: 0.30),
+          fillColor: Colors.white.withValues(alpha: 0.15),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide.none,
@@ -86,77 +133,14 @@ class _ForumState extends State<Forum> {
     );
   }
 
-  Widget _buildSkeletonList() {
-    return ListView.separated(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
-      itemCount: 6,
-      separatorBuilder: (context, index) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AveaThemes.current().cardLighterBackground,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              _SkeletonBar(width: 180, height: 16),
-              SizedBox(height: 10),
-              _SkeletonBar(width: double.infinity, height: 12),
-              SizedBox(height: 6),
-              _SkeletonBar(width: 220, height: 12),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildGradientBanner() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [
-            Color.fromARGB(255, 90, 50, 150),
-            Color.fromARGB(255, 140, 100, 200),
-            Color.fromARGB(255, 180, 140, 240),
-          ],
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.auto_awesome, color: Colors.white70, size: 18),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'Share your goals. Inspire your community.',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13.5,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.3,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AveaThemes.current().backgroundColor,
+      color: Colors.black,
       child: Column(
         children: [
+          _buildGradientHeader(),
           _buildSearchBar(),
-          _buildGradientBanner(),
           Expanded(
             child: FutureBuilder<List<ForumPost>?>(
               future: _postsFuture,
@@ -171,17 +155,17 @@ class _ForumState extends State<Forum> {
                     padding: const EdgeInsets.all(16),
                     children: [
                       const SizedBox(height: 120),
-                      Center(
+                      const Center(
                         child: Text(
                           "Failed to load forum posts.",
-                          style: TextStyle(color: AveaThemes.current().textColor),
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Center(
+                      const Center(
                         child: Text(
                           "Pull down to retry.",
-                          style: TextStyle(color: AveaThemes.current().secondaryTextColor),
+                          style: TextStyle(color: Colors.white60),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -189,8 +173,8 @@ class _ForumState extends State<Forum> {
                         child: OutlinedButton(
                           onPressed: _refreshPosts,
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AveaThemes.current().textColor,
-                            side: BorderSide(color: AveaThemes.current().secondaryTextColor),
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(color: Colors.white60),
                           ),
                           child: const Text("Retry"),
                         ),
@@ -216,19 +200,19 @@ class _ForumState extends State<Forum> {
                     listBody = ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
-                      children: [
-                        const SizedBox(height: 120),
+                      children: const [
+                        SizedBox(height: 120),
                         Center(
                           child: Text(
                             "No posts yet.",
-                            style: TextStyle(color: AveaThemes.current().textColor),
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Center(
                           child: Text(
                             "Pull down to refresh.",
-                            style: TextStyle(color: AveaThemes.current().secondaryTextColor),
+                            style: TextStyle(color: Colors.white60),
                           ),
                         ),
                       ],
@@ -237,11 +221,21 @@ class _ForumState extends State<Forum> {
                     final postWidgets = filteredPosts.indexed.map((element) {
                       final index = element.$1;
                       final post = element.$2;
-                      final colorIndex = index % AveaThemes.current().postTextColors.length;
-                      final textColor = AveaThemes.current().postTextColors[colorIndex];
+                      
+                      // Define color palette matching the image
+                      final colorPalette = [
+                        const Color(0xFFBAA7D8), // Lavender - RGB(186, 167, 216)
+                        const Color(0xFFD5B58C), // Tan - RGB(213, 181, 140)
+                        const Color(0xFF7FD4C9), // Aquamarine - RGB(127, 212, 201)
+                        const Color(0xFFA6B6E6), // Periwinkle - RGB(166, 182, 230)
+                        const Color(0xFFE098AB), // Rose - RGB(224, 152, 171)
+                      ];
+                      
+                      final colorIndex = index % colorPalette.length;
+                      final textColor = colorPalette[colorIndex];
 
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                         child: Post2(
                           title: post.title,
                           content: post.content,
@@ -256,16 +250,15 @@ class _ForumState extends State<Forum> {
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
                       children: [
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 16),
                         if (filteredPosts.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 40),
                             child: Center(
                               child: Text(
-                                'No results for "$_searchQuery"',
-                                style: TextStyle(
-                                    color: AveaThemes.current().secondaryTextColor),
+                                'No results',
+                                style: TextStyle(color: Colors.white60),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -303,8 +296,8 @@ class _SkeletonBar extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AveaThemes.current().cardBackgroundColor,
-        borderRadius: BorderRadius.circular(8),
+        color: Colors.grey.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(4),
       ),
     );
   }
