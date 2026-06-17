@@ -173,42 +173,78 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Messages'),
-        backgroundColor: AveaThemes.current().primarySwatch,
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          labelColor: Colors.white,
-          labelStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-          unselectedLabelColor: Colors.white70,
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-          ),
-          tabs: const [
-            Tab(
-              icon: Icon(Icons.inbox),
-              text: 'Received',
-            ),
-            Tab(
-              icon: Icon(Icons.outbox),
-              text: 'Sent',
-            ),
-          ],
-        ),
-      ),
       body: Container(
-        color: AveaThemes.current().backgroundColor,
-        child: TabBarView(
-          controller: _tabController,
+        color: const Color(0xFF2C3447), // Dark blue-gray background
+        child: Column(
           children: [
-            _buildBody(), // Received messages
-            _buildBody(), // Sent messages
+            // Gradient Header with Background Image
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 40, bottom: 50),
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/message banner.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  Expanded(
+                    child: Text(
+                      _tabController.index == 0 ? 'Received Messages' : 'Sent Messages',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.white, size: 28),
+                    onPressed: () {
+                      // TODO: Navigate to compose message screen
+                    },
+                  ),
+                ],
+              ),
+            ),
+            // Tab Bar
+            Container(
+              color: const Color(0xFF2C3447),
+              child: TabBar(
+                controller: _tabController,
+                indicatorColor: const Color(0xFF8B4C9E),
+                indicatorWeight: 3,
+                labelColor: Colors.white,
+                labelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                unselectedLabelColor: Colors.white60,
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+                tabs: const [
+                  Tab(text: 'Received'),
+                  Tab(text: 'Sent'),
+                ],
+              ),
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildBody(), // Received messages
+                  _buildBody(), // Sent messages
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -217,8 +253,8 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
 
   Widget _buildBody() {
     if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(color: AveaThemes.current().primarySwatch),
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFF8B4C9E)),
       );
     }
 
@@ -235,21 +271,21 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
                 children: [
                   Text(
                     _errorMessage!,
-                    style: TextStyle(color: AveaThemes.current().textColor),
+                    style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 16),
                   OutlinedButton(
                     onPressed: _loadMessages,
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AveaThemes.current().textColor,
-                      side: BorderSide(color: AveaThemes.current().secondaryTextColor),
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.white60),
                     ),
                     child: const Text('Retry'),
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  const Text(
                     'Pull down to refresh',
-                    style: TextStyle(color: AveaThemes.current().secondaryTextColor, fontSize: 12),
+                    style: TextStyle(color: Colors.white60, fontSize: 12),
                   ),
                 ],
               ),
@@ -274,13 +310,13 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
                   Icon(
                     showingSent ? Icons.outbox : Icons.inbox,
                     size: 64,
-                    color: AveaThemes.current().secondaryTextColor,
+                    color: Colors.white38,
                   ),
                   const SizedBox(height: 16),
                   Text(
                     showingSent ? 'No sent messages' : 'No messages received',
-                    style:TextStyle(
-                      color: AveaThemes.current().textColor,
+                    style: const TextStyle(
+                      color: Colors.white,
                       fontSize: 18,
                     ),
                   ),
@@ -289,12 +325,12 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
                     showingSent
                         ? 'Messages you send will appear here'
                         : 'Messages sent to you will appear here',
-                    style: TextStyle(color: AveaThemes.current().secondaryTextColor),
+                    style: const TextStyle(color: Colors.white60),
                   ),
                   const SizedBox(height: 16),
-                  Text(
+                  const Text(
                     'Pull down to refresh',
-                    style: TextStyle(color: AveaThemes.current().secondaryTextColor, fontSize: 12),
+                    style: TextStyle(color: Colors.white60, fontSize: 12),
                   ),
                 ],
               ),
@@ -309,7 +345,10 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: _messages.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        separatorBuilder: (context, index) => const Divider(
+          color: Colors.white12,
+          height: 1,
+        ),
         itemBuilder: (context, index) {
           final message = _messages[index];
           final showingSent = _tabController.index == 1;
@@ -319,51 +358,57 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
           return GestureDetector(
             onTap: () => _openMessageDetail(message),
             child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AveaThemes.current().cardLighterBackground,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 0),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            showingSent ? Icons.arrow_upward : Icons.arrow_downward,
-                            size: 16,
-                            color: showingSent ? Colors.orange : Colors.green,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            showingSent ? 'To: $otherUserName' : 'From: $otherUserName',
-                            style: TextStyle(
-                              color: AveaThemes.current().textColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        _formatDate(message.sentAt),
-                        style: TextStyle(
-                          color: AveaThemes.current().secondaryTextColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                  Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.only(top: 8, right: 12),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF8B4C9E), // Purple dot
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    message.content,
-                    style: TextStyle(color: AveaThemes.current().textColor),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    softWrap: true,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                showingSent ? 'To: $otherUserName' : 'From: $otherUserName',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              _formatDate(message.sentAt),
+                              style: const TextStyle(
+                                color: Colors.white60,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          message.content,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
