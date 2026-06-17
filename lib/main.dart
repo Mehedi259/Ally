@@ -216,7 +216,7 @@ class _AveaAppHomepageState extends State<AveaAppHomepage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Forum"),
+        title: const Text(""),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
