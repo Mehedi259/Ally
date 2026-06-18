@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:exploration_project/main.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({super.key});
 
   final TextAlign headingAlign = TextAlign.center;
   final TextAlign bodyAlign = TextAlign.justify;
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,14 +24,20 @@ class Welcome extends StatelessWidget {
             children: [
               // Custom AppBar with transparent background
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 12.0,
+                ),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                      icon: const Icon(
+                        Icons.menu,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                      onPressed: () =>
+                          appScaffoldKey.currentState?.openDrawer(),
                     ),
                     const Expanded(
                       child: Text(
@@ -43,7 +50,6 @@ class Welcome extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    const SizedBox(width: 48), // Balance the back button width
                   ],
                 ),
               ),
@@ -59,7 +65,7 @@ class Welcome extends StatelessWidget {
                           const Text(
                             "Welcome to Ally by Avea!",
                             style: TextStyle(
-                              fontSize: 28, 
+                              fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
@@ -76,7 +82,7 @@ class Welcome extends StatelessWidget {
                           Text(
                             "\"Take the first step in faith. You don't have to see the whole staircase.\" — Martin Luther King Jr.",
                             style: const TextStyle(
-                              fontSize: 18, 
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               fontStyle: FontStyle.italic,
                               color: Colors.white,
@@ -94,7 +100,7 @@ class Welcome extends StatelessWidget {
                           Text(
                             "Ally by Avea is your gateway to meaningful progress through Accountability Partnerships and Mastermind Groups. Whether you're launching a dream, building a habit, or pursuing a bold goal, this app connects you with others who share your drive—and helps you stay on track.",
                             style: const TextStyle(
-                              fontSize: 16, 
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
@@ -111,7 +117,7 @@ class Welcome extends StatelessWidget {
                           const Text(
                             "Why Ally by Avea Works",
                             style: TextStyle(
-                              fontSize: 26, 
+                              fontSize: 26,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
@@ -128,7 +134,7 @@ class Welcome extends StatelessWidget {
                           Text(
                             "Energy fuels creation. When two or more people unite in harmony, their combined thought energy becomes a powerful force for manifestation. Ally by Avea is your Alliance Portal—a space to connect, commit, and co-create with others who elevate your momentum.",
                             style: const TextStyle(
-                              fontSize: 16, 
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
@@ -145,7 +151,7 @@ class Welcome extends StatelessWidget {
                           const Text(
                             "The Creation Formula",
                             style: TextStyle(
-                              fontSize: 26, 
+                              fontSize: 26,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
@@ -162,7 +168,7 @@ class Welcome extends StatelessWidget {
                           Text(
                             "Desire + Will (Aligned Action) > Resistance = Fulfillment\n\nWhen desire and will outweigh resistance, goals become reality. Accountability minimizes resistance by adding positive pressure and shared commitment.",
                             style: const TextStyle(
-                              fontSize: 16, 
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
@@ -179,7 +185,7 @@ class Welcome extends StatelessWidget {
                           const Text(
                             "The Mastermind Principle",
                             style: TextStyle(
-                              fontSize: 26, 
+                              fontSize: 26,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
@@ -196,7 +202,7 @@ class Welcome extends StatelessWidget {
                           Text(
                             "Inspired by Napoleon Hill:\n\n\"A coordination of knowledge and effort, in a spirit of harmony, between two or more people, for the attainment of a definite purpose.\"",
                             style: const TextStyle(
-                              fontSize: 16, 
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               shadows: [
@@ -212,16 +218,28 @@ class Welcome extends StatelessWidget {
                           const SizedBox(height: 40),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 160, 126, 219),
-                              padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+                              backgroundColor: const Color.fromARGB(
+                                255,
+                                160,
+                                126,
+                                219,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 48,
+                                vertical: 16,
+                              ),
                               elevation: 5,
                             ),
                             onPressed: () {
-                              Navigator.pop(context);
+                              appHomepageKey.currentState?.navigateToTab(1);
                             },
                             child: const Text(
                               "Get Started",
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 20),

@@ -3,6 +3,7 @@ import 'package:exploration_project/notifications/local_notifications_service.da
 import 'package:flutter/material.dart';
 import 'service_locator.dart';
 import 'package:exploration_project/themes/dark_purple_theme.dart';
+import 'package:exploration_project/main.dart';
 import 'view_profile.dart';
 import 'post.dart';
 
@@ -58,9 +59,7 @@ class _ForumState extends State<Forum> {
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              _SkeletonBar(width: double.infinity, height: 20),
-            ],
+            children: const [_SkeletonBar(width: double.infinity, height: 20)],
           ),
         );
       },
@@ -77,19 +76,36 @@ class _ForumState extends State<Forum> {
           end: Alignment.bottomRight,
           colors: [
             Color(0xFF2C3E50), // Dark blue
-            Color(0xFF3498DB), // Blue  
+            Color(0xFF3498DB), // Blue
             Color(0xFF48C9B0), // Aquamarine/Cyan
           ],
         ),
       ),
-      child: const Text(
-        'Forum',
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 56,
-          fontWeight: FontWeight.bold,
+      child: SafeArea(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.white, size: 32),
+                  onPressed: () => appScaffoldKey.currentState?.openDrawer(),
+                ),
+              ),
+            ),
+            const Text(
+              'Forum',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 56,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
-        textAlign: TextAlign.center,
       ),
     );
   }
@@ -127,7 +143,10 @@ class _ForumState extends State<Forum> {
             borderRadius: BorderRadius.circular(10),
             borderSide: const BorderSide(color: Colors.white30),
           ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 0,
+            horizontal: 16,
+          ),
         ),
       ),
     );
@@ -187,14 +206,16 @@ class _ForumState extends State<Forum> {
                   final filteredPosts = _searchQuery.isEmpty
                       ? posts
                       : posts
-                          .where((p) =>
-                              p.content
-                                  .toLowerCase()
-                                  .contains(_searchQuery.toLowerCase()) ||
-                              p.title
-                                  .toLowerCase()
-                                  .contains(_searchQuery.toLowerCase()))
-                          .toList();
+                            .where(
+                              (p) =>
+                                  p.content.toLowerCase().contains(
+                                    _searchQuery.toLowerCase(),
+                                  ) ||
+                                  p.title.toLowerCase().contains(
+                                    _searchQuery.toLowerCase(),
+                                  ),
+                            )
+                            .toList();
 
                   if (posts.isEmpty) {
                     listBody = ListView(
@@ -221,21 +242,30 @@ class _ForumState extends State<Forum> {
                     final postWidgets = filteredPosts.indexed.map((element) {
                       final index = element.$1;
                       final post = element.$2;
-                      
+
                       // Define color palette matching the image
                       final colorPalette = [
-                        const Color(0xFFBAA7D8), // Lavender - RGB(186, 167, 216)
+                        const Color(
+                          0xFFBAA7D8,
+                        ), // Lavender - RGB(186, 167, 216)
                         const Color(0xFFD5B58C), // Tan - RGB(213, 181, 140)
-                        const Color(0xFF7FD4C9), // Aquamarine - RGB(127, 212, 201)
-                        const Color(0xFFA6B6E6), // Periwinkle - RGB(166, 182, 230)
+                        const Color(
+                          0xFF7FD4C9,
+                        ), // Aquamarine - RGB(127, 212, 201)
+                        const Color(
+                          0xFFA6B6E6,
+                        ), // Periwinkle - RGB(166, 182, 230)
                         const Color(0xFFE098AB), // Rose - RGB(224, 152, 171)
                       ];
-                      
+
                       final colorIndex = index % colorPalette.length;
                       final textColor = colorPalette[colorIndex];
 
                       return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 6,
+                        ),
                         child: Post2(
                           title: post.title,
                           content: post.content,
@@ -254,7 +284,9 @@ class _ForumState extends State<Forum> {
                         if (filteredPosts.isEmpty)
                           const Padding(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 40),
+                              horizontal: 16,
+                              vertical: 40,
+                            ),
                             child: Center(
                               child: Text(
                                 'No results',
@@ -307,11 +339,8 @@ class GoalPostCard extends StatelessWidget {
   final ForumPost post;
   final Color textColor;
 
-  const GoalPostCard({
-    Key? key,
-    required this.post,
-    required this.textColor,
-  }) : super(key: key);
+  const GoalPostCard({Key? key, required this.post, required this.textColor})
+    : super(key: key);
 
   String _formatTimeAgo(DateTime dateTime) {
     final now = DateTime.now();
@@ -334,9 +363,7 @@ class GoalPostCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
       color: AveaThemes.current().cardLighterBackground,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
           Navigator.push(
@@ -365,8 +392,8 @@ class GoalPostCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor:
-                        AveaThemes.current().primarySwatch.withValues(alpha: 0.2),
+                    backgroundColor: AveaThemes.current().primarySwatch
+                        .withValues(alpha: 0.2),
                     backgroundImage: AssetImage('assets/icons/app_icon.png'),
                   ),
                   const SizedBox(width: 12),
@@ -404,10 +431,14 @@ class GoalPostCard extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AveaThemes.current().primarySwatch.withValues(alpha: 0.1),
+                  color: AveaThemes.current().primarySwatch.withValues(
+                    alpha: 0.1,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: AveaThemes.current().primarySwatch.withValues(alpha: 0.3),
+                    color: AveaThemes.current().primarySwatch.withValues(
+                      alpha: 0.3,
+                    ),
                     width: 1,
                   ),
                 ),

@@ -7,6 +7,7 @@ import 'package:exploration_project/service_locator.dart';
 import 'package:exploration_project/profile/profile_service.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 // import 'package:flutter_beep/flutter_beep.dart';  // Disabled due to Android namespace issues
+import 'package:exploration_project/main.dart';
 import 'message_service.dart';
 
 class MessagesScreen extends StatefulWidget {
@@ -16,15 +17,16 @@ class MessagesScreen extends StatefulWidget {
   State<MessagesScreen> createState() => _MessagesScreenState();
 }
 
-class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProviderStateMixin {
+class _MessagesScreenState extends State<MessagesScreen>
+    with SingleTickerProviderStateMixin {
   static const _autoRefreshInterval = Duration(seconds: 30);
-  
+
   late TabController _tabController;
   List<Message> _messages = [];
   bool _isLoading = true;
   String? _errorMessage;
   Timer? _autoRefreshTimer;
-  
+
   // Cache for user profiles (to display sender/recipient names)
   final Map<String, UserProfile?> _profileCache = {};
 
@@ -131,13 +133,13 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
     return "Unknown User";
   }
 
-  void  _fetchProfileData(String userId) async {
+  void _fetchProfileData(String userId) async {
     UserProfile? profile = await ServiceLocator.profileService.getUserProfile(
-        'Dummy Token',
-        userId
+      'Dummy Token',
+      userId,
     );
     _profileCache[userId] = profile;
-    setState((){});
+    setState(() {});
   }
 
   String _formatDate(DateTime date) {
@@ -162,7 +164,7 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
       MaterialPageRoute(
         builder: (context) => MessageDetailScreen(
           message: message,
-          senderName:   _getUserName(message.senderId),
+          senderName: _getUserName(message.senderId),
           recipientName: _getUserName(message.recipientId),
           isSentMessage: showingSent,
         ),
@@ -190,12 +192,14 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
-                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.menu, color: Colors.white, size: 28),
+                    onPressed: () => appScaffoldKey.currentState?.openDrawer(),
                   ),
                   Expanded(
                     child: Text(
-                      _tabController.index == 0 ? 'Received Messages' : 'Sent Messages',
+                      _tabController.index == 0
+                          ? 'Received Messages'
+                          : 'Sent Messages',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
@@ -315,10 +319,7 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
                   const SizedBox(height: 16),
                   Text(
                     showingSent ? 'No sent messages' : 'No messages received',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -345,14 +346,14 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: _messages.length,
-        separatorBuilder: (context, index) => const Divider(
-          color: Colors.white12,
-          height: 1,
-        ),
+        separatorBuilder: (context, index) =>
+            const Divider(color: Colors.white12, height: 1),
         itemBuilder: (context, index) {
           final message = _messages[index];
           final showingSent = _tabController.index == 1;
-          final otherUserId = showingSent ? message.recipientId : message.senderId;
+          final otherUserId = showingSent
+              ? message.recipientId
+              : message.senderId;
           final otherUserName = _getUserName(otherUserId);
 
           return GestureDetector(
@@ -380,7 +381,9 @@ class _MessagesScreenState extends State<MessagesScreen> with SingleTickerProvid
                           children: [
                             Expanded(
                               child: Text(
-                                showingSent ? 'To: $otherUserName' : 'From: $otherUserName',
+                                showingSent
+                                    ? 'To: $otherUserName'
+                                    : 'From: $otherUserName',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -463,7 +466,7 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
   void _loadUserQuota() {
     final user = ServiceLocator.authService.currentUser;
     if (user == null) return;
-    
+
     final messageService = ServiceLocator.messageService;
     setState(() {
       _userQuota = messageService.getUserQuota('token', user.uid);
@@ -472,9 +475,9 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
 
   Future<void> _sendReply() async {
     if (_replyController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a message')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter a message')));
       return;
     }
 
@@ -574,7 +577,11 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
     final messageService = ServiceLocator.messageService;
 
     try {
-      await messageService.purchaseMessages('token', user.uid, '6_month_package');
+      await messageService.purchaseMessages(
+        'token',
+        user.uid,
+        '6_month_package',
+      );
       _loadUserQuota();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -597,7 +604,8 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
   }
 
   // Whether this message is from a bot archetype (no reply allowed)
-  bool get _isBotMessage => BotSenderHelper.isBotSenderId(widget.message.senderId);
+  bool get _isBotMessage =>
+      BotSenderHelper.isBotSenderId(widget.message.senderId);
 
   Widget _buildBodyForReceived() {
     if (_isBotMessage) {
@@ -621,9 +629,11 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isSentMessage
-            ? 'To: ${widget.recipientName}'
-            : 'From: ${widget.senderName}'),
+        title: Text(
+          widget.isSentMessage
+              ? 'To: ${widget.recipientName}'
+              : 'From: ${widget.senderName}',
+        ),
         backgroundColor: AveaThemes.current().primarySwatch,
       ),
       body: Stack(
@@ -887,7 +897,7 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
                       ),
                       Text(
                         _formatDateTime(widget.message.sentAt),
-                        style:  TextStyle(
+                        style: TextStyle(
                           color: AveaThemes.current().secondaryTextColor,
                           fontSize: 12,
                         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:exploration_project/main.dart';
 
 class Instructions extends StatelessWidget {
   const Instructions({super.key});
@@ -31,11 +32,12 @@ class Instructions extends StatelessWidget {
                       children: [
                         IconButton(
                           icon: const Icon(
-                            Icons.arrow_back_ios,
+                            Icons.menu,
                             color: Colors.white,
-                            size: 24,
+                            size: 28,
                           ),
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () =>
+                              appScaffoldKey.currentState?.openDrawer(),
                         ),
                         const Expanded(
                           child: Text(
@@ -49,9 +51,6 @@ class Instructions extends StatelessWidget {
                             textAlign: TextAlign.center,
                           ),
                         ),
-                        const SizedBox(
-                          width: 48,
-                        ), // Balance for the back button
                       ],
                     ),
                   ),
