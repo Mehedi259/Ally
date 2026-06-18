@@ -1,254 +1,78 @@
-import 'package:flutter/material.dart';
-import 'package:exploration_project/service_locator.dart';
-import 'package:exploration_project/messaging/message_service.dart';
-import 'package:exploration_project/profile/profile_service.dart';
-import 'package:exploration_project/themes/dark_purple_theme.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
-// import 'package:flutter_beep/flutter_beep.dart';  // Disabled due to Android namespace issues
+import sys
 
-class ViewProfile extends StatefulWidget {
-  final String? userId;
-  final String? currentUserId;
+with open('lib/view_profile.dart', 'r') as f:
+    content = f.read()
 
-  const ViewProfile({super.key, this.userId, this.currentUserId});
-
-  @override
-  State<ViewProfile> createState() => _ViewProfileState();
-}
-
-class _ViewProfileState extends State<ViewProfile> {
-  final TextEditingController _messageController = TextEditingController();
-  final ScrollController _textFieldScrollController = ScrollController();
-  final PanelController _panelController = PanelController();
-  final int _maxCharacters = 150;
-  bool _isSending = false;
-  UserMessageQuota? _userQuota;
-  bool _showSuccessBanner = false;
-  bool _isPanelOpen = false;
-
-  // Profile data
-  UserProfile? _profile;
-  bool _isLoadingProfile = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserQuota();
-    _loadProfile();
-  }
-
-  Future<void> _loadProfile() async {
-    try {
-      final userId = widget.userId;
-      if (userId == null) {
-        setState(() => _isLoadingProfile = false);
-        return;
-      }
-
-      final profile = await ServiceLocator.profileService.getUserProfile(
-        'dummy_token',
-        userId,
-      );
-
-      if (mounted) {
-        setState(() {
-          _profile = profile;
-          _isLoadingProfile = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoadingProfile = false);
-      }
-    }
-  }
-
-  void _loadUserQuota() {
-    final messageService = ServiceLocator.messageService;
-    final currentUserId = widget.currentUserId ?? "current_user_id";
-    setState(() {
-      _userQuota = messageService.getUserQuota("dummy_token", currentUserId);
-    });
-  }
-
-  Future<void> _sendMessage() async {
-    if (_messageController.text.isEmpty) {
-      _showSnackBar("Please enter a message");
-      return;
-    }
-
-    if (_userQuota == null || !_userQuota!.hasMessagesRemaining) {
-      _showPurchaseDialog();
-      return;
-    }
-
-    setState(() {
-      _isSending = true;
-    });
-
-    final messageService = ServiceLocator.messageService;
-    final message = Message(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      senderId: ServiceLocator.getLoggedInUserId(),
-      recipientId: widget.userId ?? "recipient_user_id",
-      content: _messageController.text,
-      sentAt: DateTime.now(),
-    );
-
-    try {
-      await messageService.sendMessage("dummy_token", message);
-      _messageController.clear();
-      _loadUserQuota();
-
-      // Close the panel
-      if (_panelController.isPanelOpen) {
-        await _panelController.close();
-      }
-
-      // Play system success sound (disabled due to package issues)
-      // try {
-      //   FlutterBeep.beep();
-      // } catch (soundError) {
-      //   // Silently fail if sound can't play
-      //   debugPrint('Could not play sound: $soundError');
-      // }
-
-      // Show success banner
-      setState(() {
-        _showSuccessBanner = true;
-      });
-
-      // Hide banner after 3 seconds
-      Future.delayed(Duration(seconds: 3), () {
-        if (mounted) {
-          setState(() {
-            _showSuccessBanner = false;
-          });
-        }
-      });
-    } catch (e) {
-      _showSnackBar("Failed to send message: $e");
-    } finally {
-      setState(() {
-        _isSending = false;
-      });
-    }
-  }
-
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  void _showPurchaseDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("No Messages Remaining"),
-        content: Text(
-          "You've used all your messages. Purchase more messages to continue connecting with others.\n\n"
-          "\$5.99 for 6 months includes 10 messages",
+helper_methods = """
+  Widget _buildNeonHeader() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A0F1A),
+        border: Border.all(
+          color: const Color(0xFF00CED1).withOpacity(0.5),
+          width: 1.5,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Cancel"),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF00CED1).withOpacity(0.2),
+            blurRadius: 15,
+            spreadRadius: 2,
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _purchaseMessages();
-            },
-            child: Text("Purchase"),
+          BoxShadow(
+            color: const Color(0xFF00CED1).withOpacity(0.1),
+            blurRadius: 30,
+            spreadRadius: 5,
           ),
         ],
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            const Text(
+              'View Profile',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              left: 0,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Color(0xFF00CED1), size: 28),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Future<void> _purchaseMessages() async {
-    final messageService = ServiceLocator.messageService;
-    final currentUserId = widget.currentUserId ?? "current_user_id";
+"""
 
-    try {
-      await messageService.purchaseMessages(
-        "dummy_token",
-        currentUserId,
-        "6_month_package",
-      );
-      _loadUserQuota();
-      _showSnackBar("Messages purchased successfully!");
-    } catch (e) {
-      _showSnackBar("Purchase failed: $e");
-    }
-  }
+build_idx = content.find('  @override\n  Widget build(BuildContext context) {')
+content = content[:build_idx] + helper_methods + content[build_idx:]
 
-  @override
-  void dispose() {
-    _messageController.dispose();
-    _textFieldScrollController.dispose();
-    super.dispose();
-  }
+build_start = content.find('  @override\n  Widget build(BuildContext context) {')
+content_before_build = content[:build_start]
 
-  String _getFirstName() {
-    if (_profile == null) return 'User';
-    return _profile!.name.split(' ').first;
-  }
+# We need to rewrite the entire build method and the _buildMessagePanel and _buildAvailabilityCalendar methods to match the new dark theme.
+# Actually, the python script will replace from `_buildAvailabilityCalendar` all the way to the end.
 
-  String _formatTime(String time) {
-    final parts = time.split(':');
-    final hour = int.parse(parts[0]);
-    final minute = parts[1];
-    final period = hour >= 12 ? 'PM' : 'AM';
-    final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
-    return '$displayHour:$minute $period';
-  }
+avail_idx = content.find('  Widget _buildAvailabilityCalendar() {')
+content_before_avail = content[:avail_idx]
 
-  Widget _buildProfileRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, color: AveaThemes.current().primarySwatch, size: 24),
-        SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12, // Leaving this style for now, removed color
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 16, // Leaving this style for now, removed color
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAvailabilityCalendar() {
+new_methods = """  Widget _buildAvailabilityCalendar() {
     final weeklyAvailability = _profile?.weeklyAvailability ?? {};
-
+    
     final availability = <String, List<String>>{};
-    for (var day in [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ]) {
+    for (var day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']) {
       final slots = weeklyAvailability[day] ?? [];
       availability[day] = slots.map((slot) {
         final start = _formatTime(slot['start'] ?? '09:00');
@@ -366,7 +190,7 @@ class _ViewProfileState extends State<ViewProfile> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
+          
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -382,13 +206,16 @@ class _ViewProfileState extends State<ViewProfile> {
                     ),
                   ),
                   const SizedBox(height: 8),
-
+                  
                   const Text(
                     "Messages are for scheduling only (150 character limit)",
-                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white70,
+                    ),
                   ),
                   const SizedBox(height: 20),
-
+                  
                   if (_userQuota != null)
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -428,15 +255,12 @@ class _ViewProfileState extends State<ViewProfile> {
                           if (!_userQuota!.hasMessagesRemaining)
                             TextButton(
                               onPressed: _showPurchaseDialog,
-                              child: const Text(
-                                "Buy More",
-                                style: TextStyle(color: Color(0xFF00CED1)),
-                              ),
+                              child: const Text("Buy More", style: TextStyle(color: Color(0xFF00CED1))),
                             ),
                         ],
                       ),
                     ),
-
+                  
                   TextField(
                     controller: _messageController,
                     scrollController: _textFieldScrollController,
@@ -447,7 +271,9 @@ class _ViewProfileState extends State<ViewProfile> {
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: "Type your message here...",
-                      hintStyle: const TextStyle(color: Colors.white30),
+                      hintStyle: const TextStyle(
+                        color: Colors.white30,
+                      ),
                       filled: true,
                       fillColor: Colors.black,
                       enabledBorder: OutlineInputBorder(
@@ -456,24 +282,23 @@ class _ViewProfileState extends State<ViewProfile> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color(0xFF00CED1),
-                          width: 1.5,
-                        ),
+                        borderSide: const BorderSide(color: Color(0xFF00CED1), width: 1.5),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
                       ),
                       counterText: "$remainingChars characters remaining",
-                      counterStyle: const TextStyle(color: Colors.white54),
+                      counterStyle: const TextStyle(
+                        color: Colors.white54,
+                      ),
                     ),
                     onChanged: (value) {
                       setState(() {});
                     },
                   ),
                   const SizedBox(height: 20),
-
+                  
                   SizedBox(
                     width: double.infinity,
                     child: Container(
@@ -491,10 +316,7 @@ class _ViewProfileState extends State<ViewProfile> {
                         onPressed: _isSending ? null : _sendMessage,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF0A0F1A),
-                          side: const BorderSide(
-                            color: Color(0xFF00CED1),
-                            width: 1.5,
-                          ),
+                          side: const BorderSide(color: Color(0xFF00CED1), width: 1.5),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -579,60 +401,6 @@ class _ViewProfileState extends State<ViewProfile> {
     );
   }
 
-  Widget _buildNeonHeader() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A0F1A),
-        border: Border.all(
-          color: const Color(0xFF00CED1).withValues(alpha: 0.5),
-          width: 1.5,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF00CED1).withValues(alpha: 0.2),
-            blurRadius: 15,
-            spreadRadius: 2,
-          ),
-          BoxShadow(
-            color: const Color(0xFF00CED1).withValues(alpha: 0.1),
-            blurRadius: 30,
-            spreadRadius: 5,
-          ),
-        ],
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            const Text(
-              'View Profile',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            Positioned(
-              left: 0,
-              child: IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Color(0xFF00CED1),
-                  size: 28,
-                ),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -656,11 +424,7 @@ class _ViewProfileState extends State<ViewProfile> {
               },
               panel: _buildMessagePanel(),
               body: _isLoadingProfile
-                  ? const Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF00CED1),
-                      ),
-                    )
+                  ? const Center(child: CircularProgressIndicator(color: Color(0xFF00CED1)))
                   : Container(
                       decoration: BoxDecoration(
                         gradient: RadialGradient(
@@ -678,12 +442,10 @@ class _ViewProfileState extends State<ViewProfile> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildNeonHeader(),
-
+                            
                             // Profile Avatar and Info
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Column(
                                 children: [
                                   // Glowing Text Avatar (using initials like in ProfileScreen)
@@ -691,9 +453,7 @@ class _ViewProfileState extends State<ViewProfile> {
                                     alignment: Alignment.center,
                                     children: [
                                       Text(
-                                        _getFirstName().isNotEmpty
-                                            ? _getFirstName()[0].toUpperCase()
-                                            : 'U',
+                                        _getFirstName().isNotEmpty ? _getFirstName()[0].toUpperCase() : 'U',
                                         style: TextStyle(
                                           fontSize: 90,
                                           fontFamily: 'serif',
@@ -704,9 +464,7 @@ class _ViewProfileState extends State<ViewProfile> {
                                             ..color = const Color(0xFF00CED1),
                                           shadows: [
                                             BoxShadow(
-                                              color: const Color(
-                                                0xFF00CED1,
-                                              ).withOpacity(0.8),
+                                              color: const Color(0xFF00CED1).withOpacity(0.8),
                                               blurRadius: 20,
                                               spreadRadius: 10,
                                             ),
@@ -714,9 +472,7 @@ class _ViewProfileState extends State<ViewProfile> {
                                         ),
                                       ),
                                       Text(
-                                        _getFirstName().isNotEmpty
-                                            ? _getFirstName()[0].toUpperCase()
-                                            : 'U',
+                                        _getFirstName().isNotEmpty ? _getFirstName()[0].toUpperCase() : 'U',
                                         style: TextStyle(
                                           fontSize: 90,
                                           fontFamily: 'serif',
@@ -745,14 +501,10 @@ class _ViewProfileState extends State<ViewProfile> {
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  if (_profile?.goalStatement != null &&
-                                      _profile!.goalStatement!.isNotEmpty)
+                                  if (_profile?.goalStatement != null && _profile!.goalStatement!.isNotEmpty)
                                     Text(
                                       _profile!.goalStatement!,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0xFFBAA7D8),
-                                      ),
+                                      style: const TextStyle(fontSize: 14, color: Color(0xFFBAA7D8)),
                                       textAlign: TextAlign.center,
                                     ),
                                 ],
@@ -760,88 +512,47 @@ class _ViewProfileState extends State<ViewProfile> {
                             ),
 
                             const SizedBox(height: 24),
-
+                            
                             // Profile Details
-                            if (_profile?.gender != null &&
-                                _profile!.gender!.isNotEmpty)
+                            if (_profile?.gender != null && _profile!.gender!.isNotEmpty)
                               _buildSection(
                                 icon: Icons.person_outline,
                                 title: "Gender",
-                                content: Text(
-                                  _profile!.gender!,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                                content: Text(_profile!.gender!, style: const TextStyle(color: Colors.white, fontSize: 16)),
                               ),
-                            if (_profile?.hobbies != null &&
-                                _profile!.hobbies!.isNotEmpty)
+                            if (_profile?.hobbies != null && _profile!.hobbies!.isNotEmpty)
                               _buildSection(
                                 icon: Icons.favorite_outline,
                                 title: "Hobbies / Focus Areas",
-                                content: Text(
-                                  _profile!.hobbies!,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                                content: Text(_profile!.hobbies!, style: const TextStyle(color: Colors.white, fontSize: 16)),
                               ),
-                            if (_profile?.timezone != null &&
-                                _profile!.timezone!.isNotEmpty)
+                            if (_profile?.timezone != null && _profile!.timezone!.isNotEmpty)
                               _buildSection(
                                 icon: Icons.location_on,
                                 title: "Timezone",
-                                content: Text(
-                                  _profile!.timezone!,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                                content: Text(_profile!.timezone!, style: const TextStyle(color: Colors.white, fontSize: 16)),
                               ),
-                            if (_profile?.education != null &&
-                                _profile!.education!.isNotEmpty)
+                            if (_profile?.education != null && _profile!.education!.isNotEmpty)
                               _buildSection(
                                 icon: Icons.school,
                                 title: "Education",
-                                content: Text(
-                                  _profile!.education!,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                                content: Text(_profile!.education!, style: const TextStyle(color: Colors.white, fontSize: 16)),
                               ),
-                            if (_profile?.profession != null &&
-                                _profile!.profession!.isNotEmpty)
+                            if (_profile?.profession != null && _profile!.profession!.isNotEmpty)
                               _buildSection(
                                 icon: Icons.work,
                                 title: "Profession",
-                                content: Text(
-                                  _profile!.profession!,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                ),
+                                content: Text(_profile!.profession!, style: const TextStyle(color: Colors.white, fontSize: 16)),
                               ),
 
                             const SizedBox(height: 8),
 
                             // Availability Schedule Section
                             Container(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
+                              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: const Color(0xFF8B4C9E),
-                                  width: 1.5,
-                                ),
+                                border: Border.all(color: const Color(0xFF8B4C9E), width: 1.5),
                                 borderRadius: BorderRadius.circular(12),
                                 color: Colors.transparent,
                               ),
@@ -878,7 +589,7 @@ class _ViewProfileState extends State<ViewProfile> {
                       ),
                     ),
             ),
-
+            
             if (!_isPanelOpen)
               Positioned(
                 right: 16,
@@ -901,10 +612,7 @@ class _ViewProfileState extends State<ViewProfile> {
                     backgroundColor: const Color(0xFF0A0F1A),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
-                      side: const BorderSide(
-                        color: Color(0xFF00CED1),
-                        width: 1.5,
-                      ),
+                      side: const BorderSide(color: Color(0xFF00CED1), width: 1.5),
                     ),
                     icon: const Icon(Icons.message, color: Color(0xFF00CED1)),
                     label: Text(
@@ -918,7 +626,7 @@ class _ViewProfileState extends State<ViewProfile> {
                   ),
                 ),
               ),
-
+            
             // Success Banner
             if (_showSuccessBanner)
               Positioned(
@@ -973,3 +681,8 @@ class _ViewProfileState extends State<ViewProfile> {
     );
   }
 }
+"""
+
+with open('lib/view_profile.dart', 'w') as f:
+    f.write(content_before_avail + new_methods)
+

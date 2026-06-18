@@ -369,15 +369,9 @@ class GoalPostCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(
-                  title: Text("${post.userName}'s Profile"),
-                  backgroundColor: const Color.fromARGB(255, 160, 126, 219),
-                ),
-                body: ViewProfile(
-                  currentUserId: 'current_user_id',
-                  userId: post.userId,
-                ),
+              builder: (context) => ViewProfile(
+                currentUserId: 'current_user_id',
+                userId: post.userId,
               ),
             ),
           );
