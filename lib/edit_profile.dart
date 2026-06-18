@@ -20,7 +20,8 @@ class _EditProfileState extends State<EditProfile> {
   final TextEditingController _professionController = TextEditingController();
   final TextEditingController _hobbiesController = TextEditingController();
   final TextEditingController _birthdayController = TextEditingController();
-  final TextEditingController _goalStatementController = TextEditingController();
+  final TextEditingController _goalStatementController =
+      TextEditingController();
   String? _originalGoalStatement;
   DateTime? _originalGoalStatementCreatedAt;
 
@@ -28,7 +29,7 @@ class _EditProfileState extends State<EditProfile> {
   String? _selectedGender = 'Unknown';
   String? _selectedTimezone = 'US/Pacific';
   DateTime? _selectedBirthday;
-  
+
   // Loading states
   bool _isLoading = true;
   bool _isSaving = false;
@@ -65,11 +66,23 @@ class _EditProfileState extends State<EditProfile> {
   List<BotArchetype> _archetypeOptions = [];
 
   static const List<String> _daysOfWeek = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
   ];
 
   static const List<String> _dayAbbreviations = [
-    'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun',
   ];
 
   @override
@@ -87,7 +100,10 @@ class _EditProfileState extends State<EditProfile> {
       }
 
       final results = await Future.wait([
-        ServiceLocator.profileService.getUserProfile('dummy_token', currentUser.uid),
+        ServiceLocator.profileService.getUserProfile(
+          'dummy_token',
+          currentUser.uid,
+        ),
         ServiceLocator.botService.getAllArchetypes(),
       ]);
       final profile = results[0] as UserProfile?;
@@ -106,7 +122,7 @@ class _EditProfileState extends State<EditProfile> {
           _goalStatementController.text = profile.goalStatement ?? '';
           _originalGoalStatement = profile.goalStatement;
           _originalGoalStatementCreatedAt = profile.goalStatementCreatedAt;
-          
+
           if (profile.birthday != null && profile.birthday!.isNotEmpty) {
             _birthdayController.text = profile.birthday!;
             // Parse birthday if needed
@@ -123,14 +139,22 @@ class _EditProfileState extends State<EditProfile> {
               // Ignore parsing errors
             }
           }
-          
+
           // Load weekly availability
           _weeklySchedule.clear();
           if (profile.weeklyAvailability.isNotEmpty) {
             _weeklySchedule.addAll(profile.weeklyAvailability);
           } else {
             // Initialize with empty lists if no data
-            for (var day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']) {
+            for (var day in [
+              'Monday',
+              'Tuesday',
+              'Wednesday',
+              'Thursday',
+              'Friday',
+              'Saturday',
+              'Sunday',
+            ]) {
               _weeklySchedule[day] = [];
             }
           }
@@ -139,7 +163,9 @@ class _EditProfileState extends State<EditProfile> {
           _selectedArchetypes = List<String>.from(
             profile.selectedArchetypes.isNotEmpty
                 ? profile.selectedArchetypes
-                : (profile.selectedArchetype != null ? [profile.selectedArchetype!] : []),
+                : (profile.selectedArchetype != null
+                      ? [profile.selectedArchetype!]
+                      : []),
           );
           _botDays = List<String>.from(profile.botDays);
           _botTime = profile.botTime ?? '09:00';
@@ -156,9 +182,9 @@ class _EditProfileState extends State<EditProfile> {
       print('Error loading profile: $e');
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading profile: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading profile: $e')));
       }
     }
   }
@@ -173,10 +199,13 @@ class _EditProfileState extends State<EditProfile> {
       }
 
       final newGoalStatement = _goalStatementController.text.trim();
-      final goalStatementChanged = newGoalStatement != (_originalGoalStatement ?? '');
+      final goalStatementChanged =
+          newGoalStatement != (_originalGoalStatement ?? '');
       final goalStatementCreatedAt = newGoalStatement.isEmpty
           ? null
-          : (goalStatementChanged ? DateTime.now() : _originalGoalStatementCreatedAt);
+          : (goalStatementChanged
+                ? DateTime.now()
+                : _originalGoalStatementCreatedAt);
 
       final profile = UserProfile(
         id: currentUser.uid,
@@ -193,13 +222,18 @@ class _EditProfileState extends State<EditProfile> {
         onboarded: true,
         weeklyAvailability: Map.from(_weeklySchedule),
         selectedArchetypes: List<String>.from(_selectedArchetypes),
-        selectedArchetype: _selectedArchetypes.isNotEmpty ? _selectedArchetypes.first : null,
+        selectedArchetype: _selectedArchetypes.isNotEmpty
+            ? _selectedArchetypes.first
+            : null,
         botDays: List<String>.from(_botDays),
         botTime: _selectedArchetypes.isNotEmpty ? _botTime : null,
         lastActivityAt: DateTime.now().toUtc(),
       );
 
-      await ServiceLocator.profileService.updateUserProfile('dummy_token', profile);
+      await ServiceLocator.profileService.updateUserProfile(
+        'dummy_token',
+        profile,
+      );
 
       // Schedule or cancel goal statement expiry notifications
       if (goalStatementCreatedAt != null) {
@@ -213,7 +247,9 @@ class _EditProfileState extends State<EditProfile> {
       // Activate or deactivate bot
       if (_selectedArchetypes.isNotEmpty && _botDays.isNotEmpty) {
         // Use the first selected archetype as the primary one
-        final archetype = await ServiceLocator.botService.getArchetype(_selectedArchetypes.first);
+        final archetype = await ServiceLocator.botService.getArchetype(
+          _selectedArchetypes.first,
+        );
         if (archetype != null) {
           await ServiceLocator.botService.activateBot(profile, archetype);
         }
@@ -222,17 +258,17 @@ class _EditProfileState extends State<EditProfile> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Profile and schedule saved!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Profile and schedule saved!')));
         Navigator.pop(context);
       }
     } catch (e) {
       print('Error saving profile: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error saving profile: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error saving profile: $e')));
       }
     } finally {
       if (mounted) {
@@ -333,396 +369,726 @@ class _EditProfileState extends State<EditProfile> {
     super.dispose();
   }
 
+  Widget _buildNeonHeader() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0A0F1A),
+        border: Border.all(
+          color: const Color(0xFF00CED1).withOpacity(0.5),
+          width: 1.5,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF00CED1).withOpacity(0.2),
+            blurRadius: 15,
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: const Color(0xFF00CED1).withOpacity(0.1),
+            blurRadius: 30,
+            spreadRadius: 5,
+          ),
+        ],
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            const Text(
+              'Edit Profile',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              left: 0,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: Color(0xFF00CED1),
+                  size: 28,
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _customInputDecoration(
+    String labelText, {
+    String? hintText,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      labelText: labelText,
+      hintText: hintText,
+      labelStyle: const TextStyle(color: Color(0xFF00CED1)),
+      hintStyle: const TextStyle(color: Colors.white30),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: const Color(0xFF0A0F1A),
+      enabledBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xFF8B4C9E)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: const BorderSide(color: Color(0xFF00CED1), width: 1.5),
+        borderRadius: BorderRadius.circular(12),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Edit Profile"),
-        backgroundColor: AveaThemes.current().primarySwatch
-      ),
+      backgroundColor: Colors.black,
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Container(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  // AveaThemes.current().basicInfoIcon,
-                  AveaThemes.current().basicInformationIcon,
-                  SizedBox(width: 10),
-                  Text(
-                      "Basic Information",
-                      style: Theme.of(context).textTheme.titleLarge
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF00CED1)),
+            )
+          : SafeArea(
+              child: Theme(
+                data: ThemeData.dark().copyWith(
+                  primaryColor: const Color(0xFF00CED1),
+                  colorScheme: const ColorScheme.dark(
+                    primary: Color(0xFF00CED1),
+                    secondary: Color(0xFF8B4C9E),
                   ),
-                ],
-              ),
-              // Basic Info Section
-
-              SizedBox(height: 15),
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: "Name",
-                  border: OutlineInputBorder(),
                 ),
-              ),
-              SizedBox(height: 12),
-              TextField(
-
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: "Region/Timezone",
-                  border: OutlineInputBorder(),
-                ),
-                value: _selectedTimezone,
-                items: _timezoneOptions.map((String timezone) {
-                  return DropdownMenuItem<String>(
-                    value: timezone,
-                    child: Text(timezone),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedTimezone = newValue;
-                  });
-                },
-              ),
-              SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: "Gender",
-                  border: OutlineInputBorder(),
-                ),
-                value: _selectedGender,
-                items: _genderOptions.map((String gender) {
-                  return DropdownMenuItem<String>(
-                    value: gender,
-                    child: Text(gender),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedGender = newValue;
-                  });
-                },
-              ),
-              SizedBox(height: 12),
-              TextField(
-                controller: _birthdayController,
-                decoration: InputDecoration(
-                  labelText: "Birthday",
-                  border: OutlineInputBorder(),
-                  hintText: 'MM/DD/YYYY',
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-                readOnly: true,
-                onTap: () => _selectBirthday(context),
-              ),
-              SizedBox(height: 12),
-              TextField(
-                controller: _educationController,
-                decoration: InputDecoration(
-                  labelText: "Education",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 12),
-              TextField(
-                controller: _professionController,
-                decoration: InputDecoration(
-                  labelText: "Profession",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 12),
-              TextField(
-                controller: _hobbiesController,
-                decoration: InputDecoration(
-                  labelText: "Hobbies",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              SizedBox(height: 12),
-              TextField(
-                controller: _goalStatementController,
-                decoration: InputDecoration(
-                  labelText: "Goal Statement",
-                  border: OutlineInputBorder(),
-                  hintText: "What is your main goal or aspiration?",
-                ),
-                maxLines: 3,
-                textCapitalization: TextCapitalization.sentences,
-              ),
-              SizedBox(height: 30),
-
-              // Schedule Section
-              Row(
-                children: [
-                  AveaThemes.current().availabilityIcon,
-                  SizedBox(width: 10),
-                  Text(
-                    "Weekly Availability",
-                    style: Theme.of(context).textTheme.titleLarge
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0, -0.5),
+                      radius: 1.0,
+                      colors: [
+                        const Color(0xFF00CED1).withOpacity(0.1),
+                        Colors.black,
+                      ],
+                      stops: const [0.0, 1.0],
+                    ),
                   ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Text(
-                "Set your available time slots for each day",
-                style: Theme.of(context).textTheme.bodyMedium
-              ),
-              SizedBox(height: 15),
-
-              // Schedule Editor for each day
-              ..._weeklySchedule.entries.map((entry) {
-                final day = entry.key;
-                final slots = entry.value;
-
-                return Card(
-                  margin: EdgeInsets.only(bottom: 15),
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
+                  child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Day header with add button
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              day,
-                              style: Theme.of(context).textTheme.titleMedium
-                            ),
-                            IconButton(
-                              icon: AveaThemes.current().availabilityAddIcon,
-                              onPressed: () => _addTimeSlot(day),
-                              tooltip: "Add time slot",
-                            ),
-                          ],
-                        ),
-                        // Time slots
-                        if (slots.isEmpty)
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8),
-                            child: Text(
-                              "No availability set",
-                            ),
-                          )
-                        else
-                          ...slots.asMap().entries.map((slotEntry) {
-                            final index = slotEntry.key;
-                            final slot = slotEntry.value;
-
-                            return Container(
-                              margin: EdgeInsets.only(bottom: 8),
-                              padding: EdgeInsets.all(8),
-
-                              // This decoration style is custom to this control
-                              // It's not global in ThemeData
-                              decoration: AveaThemes.current().availabilityBoxDecoration,
-                              child: Row(
+                        _buildNeonHeader(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Basic Info Section
+                              Row(
                                 children: [
-                                  // Start time button
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      icon: Icon(Icons.access_time, size: 16),
-                                      label: Text(_formatTime(slot['start']!)),
-                                      onPressed: () => _selectTime(
-                                        context,
-                                        day,
-                                        index,
-                                        'start',
-                                      ),
-                                    ),
+                                  const Icon(
+                                    Icons.person,
+                                    color: Color(0xFF00CED1),
                                   ),
-                                  SizedBox(width: 8),
+                                  const SizedBox(width: 10),
                                   Text(
-                                    "to",
-                                  ),
-                                  SizedBox(width: 8),
-                                  // End time button
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      icon: AveaThemes.current().availabilityTimeIcon,
-                                      label: Text(_formatTime(slot['end']!)),
-                                      onPressed: () => _selectTime(
-                                        context,
-                                        day,
-                                        index,
-                                        'end',
-                                      ),
+                                    "Basic Information",
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
-                                  ),
-                                  // Delete button
-                                  IconButton(
-                                    icon: AveaThemes.current().availabilityDeleteIcon,
-                                    onPressed: () =>
-                                        _removeTimeSlot(day, index),
-                                    tooltip: "Remove",
                                   ),
                                 ],
                               ),
-                            );
-                          }),
+                              const SizedBox(height: 15),
+                              TextField(
+                                controller: _nameController,
+                                decoration: _customInputDecoration("Name"),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _emailController,
+                                decoration: _customInputDecoration("Email"),
+                                keyboardType: TextInputType.emailAddress,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(height: 12),
+                              DropdownButtonFormField<String>(
+                                dropdownColor: const Color(0xFF0A0F1A),
+                                decoration: _customInputDecoration(
+                                  "Region/Timezone",
+                                ),
+                                value: _selectedTimezone,
+                                items: _timezoneOptions.map((String timezone) {
+                                  return DropdownMenuItem<String>(
+                                    value: timezone,
+                                    child: Text(
+                                      timezone,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedTimezone = newValue;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              DropdownButtonFormField<String>(
+                                dropdownColor: const Color(0xFF0A0F1A),
+                                decoration: _customInputDecoration("Gender"),
+                                value: _selectedGender,
+                                items: _genderOptions.map((String gender) {
+                                  return DropdownMenuItem<String>(
+                                    value: gender,
+                                    child: Text(
+                                      gender,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedGender = newValue;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _birthdayController,
+                                decoration: _customInputDecoration(
+                                  "Birthday",
+                                  hintText: 'MM/DD/YYYY',
+                                  suffixIcon: const Icon(
+                                    Icons.calendar_today,
+                                    color: Color(0xFF00CED1),
+                                  ),
+                                ),
+                                readOnly: true,
+                                style: const TextStyle(color: Colors.white),
+                                onTap: () => _selectBirthday(context),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _educationController,
+                                decoration: _customInputDecoration("Education"),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _professionController,
+                                decoration: _customInputDecoration(
+                                  "Profession",
+                                ),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _hobbiesController,
+                                decoration: _customInputDecoration(
+                                  "Focus Areas / Hobbies",
+                                  hintText: "e.g. Discipline, Health",
+                                ),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(height: 12),
+                              TextField(
+                                controller: _goalStatementController,
+                                decoration: _customInputDecoration(
+                                  "Goal Statement",
+                                  hintText:
+                                      "What is your main goal or aspiration?",
+                                ),
+                                maxLines: 3,
+                                style: const TextStyle(color: Colors.white),
+                                textCapitalization:
+                                    TextCapitalization.sentences,
+                              ),
+                              const SizedBox(height: 30),
+
+                              // Schedule Section
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.calendar_month,
+                                    color: Color(0xFF8B4C9E),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    "Weekly Availability",
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                "Set your available time slots for each day",
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                              const SizedBox(height: 15),
+
+                              // Schedule Editor for each day
+                              ..._weeklySchedule.entries.map((entry) {
+                                final day = entry.key;
+                                final slots = entry.value;
+
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 15),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF0A0F1A),
+                                    border: Border.all(
+                                      color: const Color(
+                                        0xFF8B4C9E,
+                                      ).withOpacity(0.5),
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Day header with add button
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              day,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.add_circle_outline,
+                                                color: Color(0xFF00CED1),
+                                              ),
+                                              onPressed: () =>
+                                                  _addTimeSlot(day),
+                                              tooltip: "Add time slot",
+                                            ),
+                                          ],
+                                        ),
+                                        // Time slots
+                                        if (slots.isEmpty)
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 8,
+                                            ),
+                                            child: Text(
+                                              "No availability set",
+                                              style: TextStyle(
+                                                color: Colors.white30,
+                                              ),
+                                            ),
+                                          )
+                                        else
+                                          ...slots.asMap().entries.map((
+                                            slotEntry,
+                                          ) {
+                                            final index = slotEntry.key;
+                                            final slot = slotEntry.value;
+
+                                            return Container(
+                                              margin: const EdgeInsets.only(
+                                                bottom: 8,
+                                              ),
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black.withOpacity(
+                                                  0.3,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  // Start time button
+                                                  Expanded(
+                                                    child: OutlinedButton.icon(
+                                                      icon: const Icon(
+                                                        Icons.access_time,
+                                                        size: 16,
+                                                        color: Color(
+                                                          0xFF00CED1,
+                                                        ),
+                                                      ),
+                                                      label: Text(
+                                                        _formatTime(
+                                                          slot['start']!,
+                                                        ),
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      style: OutlinedButton.styleFrom(
+                                                        side: const BorderSide(
+                                                          color: Color(
+                                                            0xFF00CED1,
+                                                          ),
+                                                        ),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                8,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                      onPressed: () =>
+                                                          _selectTime(
+                                                            context,
+                                                            day,
+                                                            index,
+                                                            'start',
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  const Text(
+                                                    "to",
+                                                    style: TextStyle(
+                                                      color: Colors.white70,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  // End time button
+                                                  Expanded(
+                                                    child: OutlinedButton.icon(
+                                                      icon: const Icon(
+                                                        Icons.access_time,
+                                                        size: 16,
+                                                        color: Color(
+                                                          0xFF8B4C9E,
+                                                        ),
+                                                      ),
+                                                      label: Text(
+                                                        _formatTime(
+                                                          slot['end']!,
+                                                        ),
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                      style: OutlinedButton.styleFrom(
+                                                        side: const BorderSide(
+                                                          color: Color(
+                                                            0xFF8B4C9E,
+                                                          ),
+                                                        ),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                8,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                      onPressed: () =>
+                                                          _selectTime(
+                                                            context,
+                                                            day,
+                                                            index,
+                                                            'end',
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  // Delete button
+                                                  IconButton(
+                                                    icon: const Icon(
+                                                      Icons.delete_outline,
+                                                      color: Colors.redAccent,
+                                                    ),
+                                                    onPressed: () =>
+                                                        _removeTimeSlot(
+                                                          day,
+                                                          index,
+                                                        ),
+                                                    tooltip: "Remove",
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
+
+                              const SizedBox(height: 30),
+
+                              // My Ally Bot Section
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.smart_toy_outlined,
+                                    color: Color(0xFF00CED1),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    "My Ally Archetype",
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                "Choose one or more archetypes to receive personalized messages",
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                              const SizedBox(height: 10),
+
+                              // Select All / Clear All row
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedArchetypes = _archetypeOptions
+                                            .map((a) => a.id)
+                                            .toList();
+                                      });
+                                    },
+                                    child: const Text(
+                                      'Select All',
+                                      style: TextStyle(
+                                        color: Color(0xFF00CED1),
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedArchetypes = [];
+                                        _botDays = [];
+                                      });
+                                    },
+                                    child: const Text(
+                                      'Clear All',
+                                      style: TextStyle(
+                                        color: Color(0xFF8B4C9E),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              // Multi-select Wrap of FilterChips
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: _archetypeOptions.map((archetype) {
+                                  final selected = _selectedArchetypes.contains(
+                                    archetype.id,
+                                  );
+                                  return FilterChip(
+                                    label: Text(
+                                      archetype.displayName,
+                                      style: TextStyle(
+                                        color: selected
+                                            ? Colors.black
+                                            : Colors.white,
+                                      ),
+                                    ),
+                                    selected: selected,
+                                    selectedColor: const Color(0xFF00CED1),
+                                    backgroundColor: const Color(0xFF0A0F1A),
+                                    shape: StadiumBorder(
+                                      side: BorderSide(
+                                        color: selected
+                                            ? const Color(0xFF00CED1)
+                                            : const Color(0xFF8B4C9E),
+                                      ),
+                                    ),
+                                    onSelected: (bool value) {
+                                      setState(() {
+                                        if (value) {
+                                          _selectedArchetypes.add(archetype.id);
+                                        } else {
+                                          _selectedArchetypes.remove(
+                                            archetype.id,
+                                          );
+                                          if (_selectedArchetypes.isEmpty)
+                                            _botDays = [];
+                                        }
+                                      });
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+
+                              // Days and time
+                              if (_selectedArchetypes.isNotEmpty) ...[
+                                const SizedBox(height: 20),
+                                const Text(
+                                  "Receive messages on:",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 4,
+                                  children: List.generate(_daysOfWeek.length, (
+                                    index,
+                                  ) {
+                                    final day = _daysOfWeek[index];
+                                    final selected = _botDays.contains(day);
+                                    return FilterChip(
+                                      label: Text(
+                                        _dayAbbreviations[index],
+                                        style: TextStyle(
+                                          color: selected
+                                              ? Colors.black
+                                              : Colors.white,
+                                        ),
+                                      ),
+                                      selected: selected,
+                                      selectedColor: const Color(0xFF8B4C9E),
+                                      backgroundColor: const Color(0xFF0A0F1A),
+                                      shape: StadiumBorder(
+                                        side: BorderSide(
+                                          color: selected
+                                              ? const Color(0xFF8B4C9E)
+                                              : const Color(
+                                                  0xFF00CED1,
+                                                ).withOpacity(0.5),
+                                        ),
+                                      ),
+                                      onSelected: (bool value) {
+                                        setState(() {
+                                          if (value) {
+                                            _botDays.add(day);
+                                          } else {
+                                            _botDays.remove(day);
+                                          }
+                                        });
+                                      },
+                                    );
+                                  }),
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  "At time:",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                OutlinedButton.icon(
+                                  icon: const Icon(
+                                    Icons.access_time,
+                                    color: Color(0xFF00CED1),
+                                  ),
+                                  label: Text(
+                                    _formatTime(_botTime),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    side: const BorderSide(
+                                      color: Color(0xFF00CED1),
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  onPressed: () => _selectBotTime(context),
+                                ),
+                              ],
+
+                              const SizedBox(height: 40),
+
+                              // Save button
+                              SizedBox(
+                                width: double.infinity,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFF00CED1,
+                                        ).withOpacity(0.3),
+                                        blurRadius: 15,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF0A0F1A),
+                                      side: const BorderSide(
+                                        color: Color(0xFF00CED1),
+                                        width: 1.5,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                    ),
+                                    onPressed: _isSaving ? null : _saveProfile,
+                                    child: _isSaving
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                    Color(0xFF00CED1),
+                                                  ),
+                                            ),
+                                          )
+                                        : const Text(
+                                            "Save Changes",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              color: Color(0xFF00CED1),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 40),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                );
-              }),
-
-              SizedBox(height: 30),
-
-              // My Ally Bot Section
-              Row(
-                children: [
-                  AveaThemes.current().archetypeIcon,
-                  SizedBox(width: 10),
-                  Text(
-                    "My Ally Archetype",
-                    style: Theme.of(context).textTheme.titleLarge
-                  ),
-                ],
-              ),
-              SizedBox(height: 8),
-              Text(
-                "Choose one or more archetypes to receive personalized messages",
-              ),
-              SizedBox(height: 10),
-
-              // Select All / Clear All row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedArchetypes = _archetypeOptions.map((a) => a.id).toList();
-                      });
-                    },
-                    child: Text('Select All'),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedArchetypes = [];
-                        _botDays = [];
-                      });
-                    },
-                    child: Text('Clear All'),
-                  ),
-                ],
-              ),
-
-              // Multi-select Wrap of FilterChips
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: _archetypeOptions.map((archetype) {
-                  final selected = _selectedArchetypes.contains(archetype.id);
-                  return FilterChip(
-                    label: Text(archetype.displayName),
-                    selected: selected,
-                    onSelected: (bool value) {
-                      setState(() {
-                        if (value) {
-                          _selectedArchetypes.add(archetype.id);
-                        } else {
-                          _selectedArchetypes.remove(archetype.id);
-                          if (_selectedArchetypes.isEmpty) _botDays = [];
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-
-              // Days and time — only shown when at least one archetype is selected
-              if (_selectedArchetypes.isNotEmpty) ...[
-                SizedBox(height: 20),
-                Text(
-                  "Receive messages on:",
-                  style: Theme.of(context).textTheme.titleMedium
-                ),
-                SizedBox(height: 10),
-                Wrap(
-                  spacing: 8,
-                  children: List.generate(_daysOfWeek.length, (index) {
-                    final day = _daysOfWeek[index];
-                    final selected = _botDays.contains(day);
-                    return FilterChip(
-                      label: Text(_dayAbbreviations[index]),
-                      selected: selected,
-                      onSelected: (bool value) {
-                        setState(() {
-                          if (value) {
-                            _botDays.add(day);
-                          } else {
-                            _botDays.remove(day);
-                          }
-                        });
-                      },
-                    );
-                  }),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  "At time:",
-                  style: Theme.of(context).textTheme.titleMedium
-                ),
-                SizedBox(height: 8),
-                OutlinedButton.icon(
-                  icon: AveaThemes.current().availabilityTimeIcon,
-                  label: Text(_formatTime(_botTime)),
-                  onPressed: () => _selectBotTime(context),
-                ),
-              ],
-
-              SizedBox(height: 20),
-
-              // Save button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 160, 126, 219),
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                  ),
-                  onPressed: _isSaving ? null : _saveProfile,
-                  child: _isSaving
-                      ? SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Text(
-                          "Save Changes",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
                 ),
               ),
-              SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

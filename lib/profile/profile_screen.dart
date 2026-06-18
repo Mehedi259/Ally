@@ -4,6 +4,7 @@ import 'package:exploration_project/edit_profile.dart';
 import 'package:exploration_project/service_locator.dart';
 import 'package:exploration_project/profile/profile_service.dart';
 import 'package:exploration_project/main.dart';
+import 'package:exploration_project/authentication/subscription_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -79,51 +80,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          const Text(
-            'Profile',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors
-                  .black, // Makes it look cut out if the background was bright, but here we want white
-            ),
-          ),
-          const Text(
-            'Profile',
-            style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          Positioned(
-            left: 0,
-            child: IconButton(
-              icon: const Icon(Icons.menu, color: Color(0xFF00CED1), size: 28),
-              onPressed: () => appScaffoldKey.currentState?.openDrawer(),
-            ),
-          ),
-          Positioned(
-            right: 0,
-            child: IconButton(
-              icon: const Icon(
-                Icons.settings_outlined,
-                color: Color(0xFF00CED1),
-                size: 28,
+      child: SizedBox(
+        width: double.infinity,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            const Text(
+              'Profile',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors
+                    .black, // Makes it look cut out if the background was bright, but here we want white
               ),
-              onPressed: () async {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const EditProfile()),
-                );
-                _loadProfile(); // Reload if changes were made
-              },
             ),
-          ),
-        ],
+            const Text(
+              'Profile',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              left: 0,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.menu,
+                  color: Color(0xFF00CED1),
+                  size: 28,
+                ),
+                onPressed: () => appScaffoldKey.currentState?.openDrawer(),
+              ),
+            ),
+            Positioned(
+              right: 0,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.settings_outlined,
+                  color: Color(0xFF00CED1),
+                  size: 28,
+                ),
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EditProfile(),
+                    ),
+                  );
+                  _loadProfile(); // Reload if changes were made
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -288,14 +298,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
-          if (trailing != null)
-            trailing
-          else
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white30,
-              size: 16,
-            ),
+          if (trailing != null) trailing,
         ],
       ),
     );
@@ -362,17 +365,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'Free Plan  •  14-Day Trial',
         style: TextStyle(color: Colors.white70, fontSize: 14),
       ),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFF00CED1)),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: const Text(
-          'Upgrade',
-          style: TextStyle(
-            color: Color(0xFF00CED1),
-            fontWeight: FontWeight.bold,
+      trailing: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SubscriptionScreen(
+              onComplete: () {
+                Navigator.pop(context); // pop the subscription screen
+              },
+            )),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            border: Border.all(color: const Color(0xFF00CED1)),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: const Text(
+            'Upgrade',
+            style: TextStyle(
+              color: Color(0xFF00CED1),
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
