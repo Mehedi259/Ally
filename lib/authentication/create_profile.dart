@@ -284,9 +284,11 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           ),
         ),
       ),
-      body: Container(
-        color: AveaThemes.current().backgroundColor,
-        child: SingleChildScrollView(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Container(
+          color: AveaThemes.current().backgroundColor,
+          child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -733,6 +735,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
               const SizedBox(height: 20),
             ],
           ),
+        ),
         ),
       ),
     );

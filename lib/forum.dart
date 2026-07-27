@@ -154,8 +154,10 @@ class _ForumState extends State<Forum> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Container(
+        color: Colors.black,
       child: Column(
         children: [
           _buildGradientHeader(),
@@ -312,6 +314,7 @@ class _ForumState extends State<Forum> {
           ),
         ],
       ),
+    ),
     );
   }
 }

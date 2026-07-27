@@ -337,8 +337,10 @@ class _ViewProfileState extends State<ViewProfile> {
   Widget _buildMessagePanel() {
     final remainingChars = _maxCharacters - _messageController.text.length;
 
-    return Container(
-      decoration: BoxDecoration(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Container(
+        decoration: BoxDecoration(
         color: const Color(0xFF0A0F1A),
         border: const Border(
           top: BorderSide(color: Color(0xFF00CED1), width: 2),
@@ -369,7 +371,12 @@ class _ViewProfileState extends State<ViewProfile> {
 
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: 20 + MediaQuery.of(context).viewInsets.bottom,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -536,6 +543,7 @@ class _ViewProfileState extends State<ViewProfile> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -637,7 +645,9 @@ class _ViewProfileState extends State<ViewProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SafeArea(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SafeArea(
         child: Stack(
           children: [
             SlidingUpPanel(
@@ -968,6 +978,7 @@ class _ViewProfileState extends State<ViewProfile> {
                 ),
               ),
           ],
+        ),
         ),
       ),
     );

@@ -451,7 +451,9 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: _isLoading
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: _isLoading
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF00CED1)),
             )
@@ -1089,6 +1091,7 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               ),
             ),
+      ),
     );
   }
 }

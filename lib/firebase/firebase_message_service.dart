@@ -79,18 +79,17 @@ class FirebaseMessageService implements IMessageService {
 
   @override
   Future<void> writeBotMessages(
-    String botSenderId,
     String recipientId,
-    List<({DateTime scheduledAt, String content})> schedule,
+    List<({DateTime scheduledAt, String content, String senderId})> schedule,
   ) async {
     try {
       final batch = _firestore.batch();
       for (final entry in schedule) {
-        final id = '${botSenderId}_${recipientId}_${entry.scheduledAt.millisecondsSinceEpoch}';
+        final id = '${entry.senderId}_${recipientId}_${entry.scheduledAt.millisecondsSinceEpoch}';
         final ref = _firestore.collection(_collection).doc(id);
         batch.set(ref, Message(
           id: id,
-          senderId: botSenderId,
+          senderId: entry.senderId,
           recipientId: recipientId,
           content: entry.content,
           sentAt: entry.scheduledAt,

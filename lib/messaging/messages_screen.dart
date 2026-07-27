@@ -391,13 +391,6 @@ class _MessagesScreenState extends State<MessagesScreen>
                                 ),
                               ),
                             ),
-                            Text(
-                              _formatDate(message.sentAt),
-                              style: const TextStyle(
-                                color: Colors.white60,
-                                fontSize: 12,
-                              ),
-                            ),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -636,8 +629,10 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
         ),
         backgroundColor: AveaThemes.current().primarySwatch,
       ),
-      body: Stack(
-        children: [
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Stack(
+          children: [
           // Main content with SlidingUpPanel (only for non-bot received messages)
           if (!widget.isSentMessage)
             _buildBodyForReceived()
@@ -670,6 +665,7 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
             ),
         ],
       ),
+    ),
       // Reply FAB (only for non-bot received messages)
       floatingActionButton: (!widget.isSentMessage && !_isBotMessage)
           ? FloatingActionButton.extended(
@@ -685,8 +681,10 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
   Widget _buildReplyPanel() {
     final remainingChars = _maxCharacters - _replyController.text.length;
 
-    return Container(
-      decoration: BoxDecoration(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Container(
+        decoration: BoxDecoration(
         color: AveaThemes.current().cardBackgroundColor,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
@@ -714,7 +712,12 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: 20 + MediaQuery.of(context).viewInsets.bottom,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -862,6 +865,7 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -893,13 +897,6 @@ class _MessageDetailScreenState extends State<MessageDetailScreen> {
                               ? Colors.orange
                               : Colors.green,
                           fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        _formatDateTime(widget.message.sentAt),
-                        style: TextStyle(
-                          color: AveaThemes.current().secondaryTextColor,
-                          fontSize: 12,
                         ),
                       ),
                     ],

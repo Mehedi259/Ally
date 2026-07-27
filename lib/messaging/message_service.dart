@@ -60,9 +60,8 @@ abstract interface class IMessageService {
   Future<List<Message>> getSentMessages(String token, String userId);
   Future<void> purchaseMessages(String token, String userId, String packageId);
   Future<void> writeBotMessages(
-    String botSenderId,
     String recipientId,
-    List<({DateTime scheduledAt, String content})> schedule,
+    List<({DateTime scheduledAt, String content, String senderId})> schedule,
   );
   Future<void> cancelFutureBotMessages(String userId);
 }
@@ -159,9 +158,8 @@ class MessageService implements IMessageService {
 
   @override
   Future<void> writeBotMessages(
-    String botSenderId,
     String recipientId,
-    List<({DateTime scheduledAt, String content})> schedule,
+    List<({DateTime scheduledAt, String content, String senderId})> schedule,
   ) async {}
 
   @override

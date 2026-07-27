@@ -116,7 +116,7 @@ class BotSenderHelper {
     if (archetypeId.startsWith('multi_')) {
       final ids = archetypeId.substring('multi_'.length).split('_');
       final names = ids.map((id) => _displayNames[id] ?? 'Ally').toList();
-      return names.join(', ');
+      return names.first;
     }
     return _displayNames[archetypeId] ?? 'Ally';
   }

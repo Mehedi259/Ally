@@ -137,9 +137,11 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: AveaThemes.current().primarySwatch,
       ),
       backgroundColor: AveaThemes.current().backgroundColor,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Form(
               key: _formKey,
@@ -399,6 +401,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+        ),
         ),
       ),
     );
