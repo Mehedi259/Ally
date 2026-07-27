@@ -73,23 +73,45 @@ class FirebaseMessageService implements IMessageService {
 
       final threeDaysAgo = now.subtract(const Duration(days: 3));
 
-      return snapshot.docs
+      final List<Message> allMessages = snapshot.docs
           .map((doc) => Message.fromJson(doc.data()))
-          .where((msg) {
-            // Strictly filter out any future messages (due to timezone string comparison quirks)
-            if (msg.sentAt.isAfter(now)) {
-              return false;
-            }
-            
-            // Bot messages delete after 3 days
-            if (msg.senderId.startsWith('bot_')) {
-              return msg.sentAt.isAfter(threeDaysAgo);
-            }
-            
-            // User messages delete after 7 days (already mostly handled by the query, but enforced here)
-            return true;
-          })
           .toList();
+
+      final List<Message> filteredMessages = [];
+      final Set<String> botDatesSeen = {};
+      int botCount = 0;
+
+      for (final msg in allMessages) {
+        // Strictly filter out any future messages (due to timezone string comparison quirks)
+        if (msg.sentAt.isAfter(now)) {
+          continue;
+        }
+
+        if (msg.senderId.startsWith('bot_')) {
+          // Bot messages delete after 3 days
+          if (!msg.sentAt.isAfter(threeDaysAgo)) {
+            continue;
+          }
+          
+          // Max 3 bot messages in total
+          if (botCount >= 3) {
+            continue;
+          }
+          
+          // Only 1 archetype message per day
+          final dateKey = '${msg.sentAt.year}-${msg.sentAt.month}-${msg.sentAt.day}';
+          if (botDatesSeen.contains(dateKey)) {
+            continue;
+          }
+          
+          botDatesSeen.add(dateKey);
+          botCount++;
+        }
+        
+        filteredMessages.add(msg);
+      }
+
+      return filteredMessages;
     } catch (e) {
       print('Error fetching received messages: $e');
       return [];
