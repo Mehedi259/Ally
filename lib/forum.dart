@@ -68,44 +68,48 @@ class _ForumState extends State<Forum> {
 
   Widget _buildGradientHeader() {
     return Container(
+      margin: const EdgeInsets.only(top: 60, bottom: 12),
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 50),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF2C3E50), // Dark blue
-            Color(0xFF3498DB), // Blue
-            Color(0xFF48C9B0), // Aquamarine/Cyan
-          ],
-        ),
-      ),
-      child: SafeArea(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.white, size: 32),
-                  onPressed: () => appScaffoldKey.currentState?.openDrawer(),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              'assets/instruction banner.jpeg',
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.menu,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                  onPressed: () =>
+                      appScaffoldKey.currentState?.openDrawer(),
                 ),
-              ),
+                const Expanded(
+                  child: Text(
+                    'Forum',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             ),
-            const Text(
-              'Forum',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 56,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

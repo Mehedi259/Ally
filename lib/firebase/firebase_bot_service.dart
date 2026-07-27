@@ -55,16 +55,16 @@ class FirebaseBotService implements IBotService {
               : [archetype.id]);
 
     // Fetch all selected archetypes' messages
-    List<({String archetypeId, String message})> combinedMessages = [];
+    List<({String archetypeId, String displayName, String message})> combinedMessages = [];
     for (final id in archetypeIds) {
       final a = await getArchetype(id);
       if (a != null) {
-        combinedMessages.addAll(a.messages.map((m) => (archetypeId: id, message: m)));
+        combinedMessages.addAll(a.messages.map((m) => (archetypeId: id, displayName: a.displayName, message: m)));
       }
     }
     // If nothing fetched (edge case), fall back to the provided archetype
     if (combinedMessages.isEmpty) {
-      combinedMessages = archetype.messages.map((m) => (archetypeId: archetype.id, message: m)).toList();
+      combinedMessages = archetype.messages.map((m) => (archetypeId: archetype.id, displayName: archetype.displayName, message: m)).toList();
     }
 
     // Shuffle the combined message pool to prevent repetition
@@ -74,7 +74,7 @@ class FirebaseBotService implements IBotService {
     await ServiceLocator.localNotificationsService.cancelBotNotifications();
     await ServiceLocator.messageService.cancelFutureBotMessages(p.id);
 
-    // Compute 72-hour delay offset based on last activity
+    // Compute delay offset based on last activity
     final delayHours = _computeDelayHours(p.lastActivityAt);
 
     // Generate the schedule with the delay
@@ -101,7 +101,7 @@ class FirebaseBotService implements IBotService {
             (e) => (
               id: e.id,
               scheduledAt: e.scheduledAt,
-              title: '',
+              title: e.displayName, // Use archetype displayName instead of empty string
               body: e.message,
             ),
           )
@@ -163,9 +163,9 @@ class FirebaseBotService implements IBotService {
   static const int _botNotificationBaseId = 1000;
   static const int _maxNotifications = 60;
 
-  List<({int id, tz.TZDateTime scheduledAt, String message, String archetypeId})> _buildSchedule(
+  List<({int id, tz.TZDateTime scheduledAt, String displayName, String message, String archetypeId})> _buildSchedule(
     UserProfile profile,
-    List<({String archetypeId, String message})> messages, {
+    List<({String archetypeId, String displayName, String message})> messages, {
     int delayHours = 0,
   }) {
     final ianaTimezone =
@@ -176,7 +176,7 @@ class FirebaseBotService implements IBotService {
 
     final now = tz.TZDateTime.now(location);
 
-    final result = <({int id, tz.TZDateTime scheduledAt, String message, String archetypeId})>[];
+    final result = <({int id, tz.TZDateTime scheduledAt, String displayName, String message, String archetypeId})>[];
     int messageIndex = 0;
 
     // First message: schedule immediately (within next few seconds)
@@ -184,6 +184,7 @@ class FirebaseBotService implements IBotService {
     result.add((
       id: _botNotificationBaseId,
       scheduledAt: now.add(const Duration(seconds: 5)), // 5 seconds from now
+      displayName: firstMsg.displayName,
       message: firstMsg.message,
       archetypeId: firstMsg.archetypeId,
     ));
@@ -199,6 +200,7 @@ class FirebaseBotService implements IBotService {
       result.add((
         id: _botNotificationBaseId + count,
         scheduledAt: nextScheduledTime,
+        displayName: msg.displayName,
         message: msg.message,
         archetypeId: msg.archetypeId,
       ));
