@@ -148,38 +148,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       children: [
         // Glowing Text Avatar
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Text(
-              initials,
-              style: TextStyle(
-                fontSize: 90,
-                fontFamily: 'serif',
-                fontWeight: FontWeight.bold,
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 3
-                  ..color = const Color(0xFF00CED1),
-                shadows: [
-                  BoxShadow(
-                    color: const Color(0xFF00CED1).withValues(alpha: 0.8),
-                    blurRadius: 20,
-                    spreadRadius: 10,
-                  ),
-                ],
+        Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF00CED1).withValues(alpha: 0.6),
+                blurRadius: 20,
+                spreadRadius: 2,
               ),
-            ),
-            Text(
-              initials,
-              style: TextStyle(
-                fontSize: 90,
-                fontFamily: 'serif',
-                fontWeight: FontWeight.bold,
-                color: Colors.black.withValues(alpha: 0.7),
-              ),
-            ),
-          ],
+            ],
+          ),
+          child: Image.asset(
+            'assets/icons/app_icon.png',
+            fit: BoxFit.contain,
+          ),
         ),
         const SizedBox(height: 16),
         Text(

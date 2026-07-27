@@ -391,6 +391,13 @@ class _MessagesScreenState extends State<MessagesScreen>
                                 ),
                               ),
                             ),
+                            Text(
+                              '${message.sentAt.hour > 12 ? message.sentAt.hour - 12 : (message.sentAt.hour == 0 ? 12 : message.sentAt.hour)}:${message.sentAt.minute.toString().padLeft(2, '0')} ${message.sentAt.hour >= 12 ? 'PM' : 'AM'}',
+                              style: const TextStyle(
+                                color: Colors.white54,
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 8),
