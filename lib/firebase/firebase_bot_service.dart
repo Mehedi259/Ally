@@ -101,7 +101,7 @@ class FirebaseBotService implements IBotService {
             (e) => (
               id: e.id,
               scheduledAt: e.scheduledAt,
-              title: _buildDisplayName(archetypeIds),
+              title: '',
               body: e.message,
             ),
           )
@@ -112,7 +112,7 @@ class FirebaseBotService implements IBotService {
     // Use the primary/first archetype's sender ID (or 'bot_multi' for multi-select)
     final botSenderId = archetypeIds.length == 1
         ? BotSenderHelper.senderIdForArchetype(archetypeIds.first)
-        : BotSenderHelper.senderIdForArchetype(archetypeIds.first);
+        : BotSenderHelper.senderIdForArchetype('multi_${archetypeIds.join("_")}');
     await ServiceLocator.messageService.writeBotMessages(
       botSenderId,
       p.id,
@@ -131,17 +131,6 @@ class FirebaseBotService implements IBotService {
   }
 
   // ─────────────────────────── helpers ────────────────────────────────────
-
-  /// Returns a comma-separated display name for one or more archetypes.
-  String _buildDisplayName(List<String> archetypeIds) {
-    if (archetypeIds.length == 1) {
-      return BotSenderHelper.displayNameForSenderId(
-            BotSenderHelper.senderIdForArchetype(archetypeIds.first),
-          ) ??
-          'Your Ally Bot';
-    }
-    return 'Your Ally Bot';
-  }
 
   /// Computes the hours to delay the first message based on user's last
   /// activity.

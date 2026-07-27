@@ -110,10 +110,14 @@ class BotSenderHelper {
     'grandmaster_of_do_nothing': 'Grandmaster of Do Nothing',
   };
 
-  /// Returns the archetype display name for a bot senderId, or null if not a bot.
   static String? displayNameForSenderId(String senderId) {
     if (!isBotSenderId(senderId)) return null;
     final archetypeId = senderId.substring(_botPrefix.length);
-    return _displayNames[archetypeId] ?? 'Your Ally Bot';
+    if (archetypeId.startsWith('multi_')) {
+      final ids = archetypeId.substring('multi_'.length).split('_');
+      final names = ids.map((id) => _displayNames[id] ?? 'Ally').toList();
+      return names.join(', ');
+    }
+    return _displayNames[archetypeId] ?? 'Ally';
   }
 }
