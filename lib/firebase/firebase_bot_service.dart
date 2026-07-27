@@ -189,8 +189,8 @@ class FirebaseBotService implements IBotService {
     ));
     messageIndex++;
 
-    // Subsequent messages: schedule 72 hours apart
-    var nextScheduledTime = now.add(const Duration(hours: 72));
+    // Subsequent messages: schedule 24 hours apart
+    var nextScheduledTime = now.add(const Duration(hours: 24));
     int count = 1;
 
     while (count < _maxNotifications && messageIndex < messages.length * 10) {
@@ -205,7 +205,7 @@ class FirebaseBotService implements IBotService {
 
       messageIndex++;
       count++;
-      nextScheduledTime = nextScheduledTime.add(const Duration(hours: 72));
+      nextScheduledTime = nextScheduledTime.add(const Duration(hours: 24));
     }
 
     return result;

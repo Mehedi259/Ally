@@ -190,15 +190,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             color: Colors.white,
           ),
         ),
-        const SizedBox(height: 4),
-        Text(
-          '@$username',
-          style: const TextStyle(
-            fontSize: 16,
-            color: Color(0xFF00CED1),
-            fontWeight: FontWeight.w500,
-          ),
-        ),
         const SizedBox(height: 8),
         Text(
           tagline,
@@ -426,7 +417,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _buildNeonHeader(),
                 const SizedBox(height: 20),
                 _buildAvatarAndInfo(),
-                _buildStatsRow(),
                 _buildAboutMe(),
                 _buildFocusAreas(),
                 _buildAccountStatus(),

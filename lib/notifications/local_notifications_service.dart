@@ -13,7 +13,7 @@ class LocalNotificationsService {
 
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
 
-  final _androidInitializationSettings = const AndroidInitializationSettings('@mipmap/ic_launcher');
+  final _androidInitializationSettings = const AndroidInitializationSettings('@mipmap/launcher_icon');
 
   final _iosInitializationSettings = const DarwinInitializationSettings(
     requestAlertPermission: true,
@@ -85,6 +85,10 @@ class LocalNotificationsService {
           AndroidFlutterLocalNotificationsPlugin>();
       
       if (androidPlugin != null) {
+        // Request notification permission (Android 13+)
+        final notificationsGranted = await androidPlugin.requestNotificationsPermission();
+        print("Notifications permission requested. Granted: $notificationsGranted");
+
         // Request exact alarm permission (Android 12+)
         final canScheduleExactAlarms = await androidPlugin.canScheduleExactNotifications();
         print("Can schedule exact alarms: $canScheduleExactAlarms");

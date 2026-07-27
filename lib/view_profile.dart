@@ -745,15 +745,6 @@ class _ViewProfileState extends State<ViewProfile> {
                                       color: Colors.white,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    _profile?.email.split('@').first ?? 'user',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Color(0xFF00CED1),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
                                   const SizedBox(height: 8),
                                   if (_profile?.goalStatement != null &&
                                       _profile!.goalStatement!.isNotEmpty)

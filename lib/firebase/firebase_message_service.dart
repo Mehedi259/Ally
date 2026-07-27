@@ -60,16 +60,35 @@ class FirebaseMessageService implements IMessageService {
     try {
       final now = DateTime.now();
       final sevenDaysAgo = now.subtract(const Duration(days: 7)).toIso8601String();
+      // Fetch broadly from the last 7 days up to a bit in the future to account for string comparison issues
+      final futureBuffer = now.add(const Duration(days: 1)).toIso8601String();
+      
       final snapshot = await _firestore
           .collection(_collection)
           .where('recipientId', isEqualTo: ServiceLocator.getLoggedInUserId())
           .where('sentAt', isGreaterThanOrEqualTo: sevenDaysAgo)
-          .where('sentAt', isLessThanOrEqualTo: now.toIso8601String())
+          .where('sentAt', isLessThanOrEqualTo: futureBuffer)
           .orderBy('sentAt', descending: true)
           .get();
 
+      final threeDaysAgo = now.subtract(const Duration(days: 3));
+
       return snapshot.docs
           .map((doc) => Message.fromJson(doc.data()))
+          .where((msg) {
+            // Strictly filter out any future messages (due to timezone string comparison quirks)
+            if (msg.sentAt.isAfter(now)) {
+              return false;
+            }
+            
+            // Bot messages delete after 3 days
+            if (msg.senderId.startsWith('bot_')) {
+              return msg.sentAt.isAfter(threeDaysAgo);
+            }
+            
+            // User messages delete after 7 days (already mostly handled by the query, but enforced here)
+            return true;
+          })
           .toList();
     } catch (e) {
       print('Error fetching received messages: $e');
