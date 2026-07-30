@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:exploration_project/main.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Instructions extends StatelessWidget {
   const Instructions({super.key});
@@ -7,13 +8,16 @@ class Instructions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Container(
         color: Colors.black,
-        child: Column(
-          children: [
-            // Header with Background Image
-            Container(
-              margin: const EdgeInsets.only(top: 60, bottom: 12),
+        height: MediaQuery.of(context).size.height,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Header with Background Image
+              Container(
+                margin: const EdgeInsets.only(top: 60, bottom: 12),
               width: double.infinity,
               child: Stack(
                 alignment: Alignment.center,
@@ -58,13 +62,12 @@ class Instructions extends StatelessWidget {
               ),
             ),
             // Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-                child: Column(
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 16,
+              ),
+              child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildSection(
@@ -305,7 +308,22 @@ class Instructions extends StatelessWidget {
                           const SizedBox(height: 8),
                           const Text('Connect with Avea Accountability Partner, Life Coach & Psychic:', style: TextStyle(color: Colors.white70, fontSize: 16)),
                           const SizedBox(height: 4),
-                          const Text('www.aveaexperience.com', style: TextStyle(color: Colors.blueAccent, fontSize: 16, decoration: TextDecoration.underline)),
+                          GestureDetector(
+                            onTap: () async {
+                              final Uri url = Uri.parse('https://www.aveaexperience.com');
+                              if (!await launchUrl(url)) {
+                                debugPrint('Could not launch $url');
+                              }
+                            },
+                            child: const Text(
+                              'www.aveaexperience.com',
+                              style: TextStyle(
+                                color: Colors.blueAccent,
+                                fontSize: 16,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -360,8 +378,8 @@ class Instructions extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

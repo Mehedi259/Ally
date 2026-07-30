@@ -1,7 +1,9 @@
 import 'package:exploration_project/themes/dark_purple_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 import 'firebase_options.dart';
 import 'forum.dart';
 import 'menu.dart';
@@ -17,7 +19,16 @@ import 'package:exploration_project/profile/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  tz.initializeTimeZones();
+  tz_data.initializeTimeZones();
+  
+  try {
+    final timeZoneInfo = await FlutterTimezone.getLocalTimezone();
+    final timeZoneName = timeZoneInfo.identifier;
+    tz.setLocalLocation(tz.getLocation(timeZoneName));
+    print('Local timezone set to: $timeZoneName');
+  } catch (e) {
+    print('Could not get local timezone: $e');
+  }
 
   try {
     await Firebase.initializeApp(

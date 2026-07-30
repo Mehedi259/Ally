@@ -56,10 +56,7 @@ class AppMenu extends StatelessWidget {
               Navigator.pop(context);
             },
           ),
-          const ListTile(
-            title: const Text("My Professional Links"),
-            leading: const Icon(Icons.business),
-          ),
+
           ListTile(
             title: const Text("Logout"),
             leading: const Icon(Icons.logout),

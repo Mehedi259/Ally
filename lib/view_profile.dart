@@ -72,6 +72,8 @@ class _ViewProfileState extends State<ViewProfile> {
   }
 
   Future<void> _sendMessage() async {
+    FocusScope.of(context).unfocus();
+
     if (_messageController.text.isEmpty) {
       _showSnackBar("Please enter a message");
       return;
@@ -653,7 +655,7 @@ class _ViewProfileState extends State<ViewProfile> {
             SlidingUpPanel(
               controller: _panelController,
               minHeight: 0,
-              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              maxHeight: MediaQuery.of(context).size.height * 0.9,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(24),
                 topRight: Radius.circular(24),
@@ -685,7 +687,6 @@ class _ViewProfileState extends State<ViewProfile> {
                       ),
                       child: SingleChildScrollView(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildNeonHeader(),
 
@@ -696,45 +697,23 @@ class _ViewProfileState extends State<ViewProfile> {
                               ),
                               child: Column(
                                 children: [
-                                  // Glowing Text Avatar (using initials like in ProfileScreen)
-                                  Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Text(
-                                        _getFirstName().isNotEmpty
-                                            ? _getFirstName()[0].toUpperCase()
-                                            : 'U',
-                                        style: TextStyle(
-                                          fontSize: 90,
-                                          fontFamily: 'serif',
-                                          fontWeight: FontWeight.bold,
-                                          foreground: Paint()
-                                            ..style = PaintingStyle.stroke
-                                            ..strokeWidth = 3
-                                            ..color = const Color(0xFF00CED1),
-                                          shadows: [
-                                            BoxShadow(
-                                              color: const Color(
-                                                0xFF00CED1,
-                                              ).withOpacity(0.8),
-                                              blurRadius: 20,
-                                              spreadRadius: 10,
-                                            ),
-                                          ],
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF00CED1).withValues(alpha: 0.6),
+                                          blurRadius: 20,
+                                          spreadRadius: 2,
                                         ),
-                                      ),
-                                      Text(
-                                        _getFirstName().isNotEmpty
-                                            ? _getFirstName()[0].toUpperCase()
-                                            : 'U',
-                                        style: TextStyle(
-                                          fontSize: 90,
-                                          fontFamily: 'serif',
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black.withOpacity(0.7),
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                    child: Image.asset(
+                                      'assets/icons/app_icon.png',
+                                      fit: BoxFit.contain,
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
                                   Text(

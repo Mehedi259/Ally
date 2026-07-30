@@ -23,13 +23,7 @@ class Post2 extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(
-                  title: Text("Post Details"),
-                  backgroundColor: const Color.fromARGB(255, 160, 126, 219),
-                ),
-                body: ViewProfile(currentUserId: currentUserId, userId: userId),
-              ),
+              builder: (context) => ViewProfile(currentUserId: currentUserId, userId: userId),
             ),
           );
         },

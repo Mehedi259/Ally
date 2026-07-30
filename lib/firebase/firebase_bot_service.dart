@@ -168,46 +168,51 @@ class FirebaseBotService implements IBotService {
     List<({String archetypeId, String displayName, String message})> messages, {
     int delayHours = 0,
   }) {
-    final ianaTimezone =
-        _timezoneMap[profile.timezone] ??
-        profile.timezone ??
-        'America/Los_Angeles';
-    final location = tz.getLocation(ianaTimezone);
-
+    // Use the device's local timezone so the time matches exactly what the user sees on their clock
+    final location = tz.local;
     final now = tz.TZDateTime.now(location);
 
     final result = <({int id, tz.TZDateTime scheduledAt, String displayName, String message, String archetypeId})>[];
     int messageIndex = 0;
 
-    // First message: schedule immediately (within next few seconds)
-    final firstMsg = messages[messageIndex % messages.length];
-    result.add((
-      id: _botNotificationBaseId,
-      scheduledAt: now.add(const Duration(seconds: 5)), // 5 seconds from now
-      displayName: firstMsg.displayName,
-      message: firstMsg.message,
-      archetypeId: firstMsg.archetypeId,
-    ));
-    messageIndex++;
+    final timeParts = (profile.botTime ?? '09:00').split(':');
+    final targetHour = int.tryParse(timeParts[0]) ?? 9;
+    final targetMinute = int.tryParse(timeParts.length > 1 ? timeParts[1] : '0') ?? 0;
 
-    // Subsequent messages: schedule 24 hours apart
-    var nextScheduledTime = now.add(const Duration(hours: 24));
-    int count = 1;
+    var currentDay = tz.TZDateTime(
+      location,
+      now.year,
+      now.month,
+      now.day,
+      targetHour,
+      targetMinute,
+    );
 
+    // If the time has already passed today, start from tomorrow
+    if (currentDay.isBefore(now)) {
+      currentDay = currentDay.add(const Duration(days: 1));
+    }
+
+    final botDays = profile.botDays.isNotEmpty 
+        ? profile.botDays 
+        : ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final validWeekdays = botDays.map((d) => _dayToWeekday[d]).whereType<int>().toSet();
+
+    int count = 0;
     while (count < _maxNotifications && messageIndex < messages.length * 10) {
-      // Allow message repetition
-      final msg = messages[messageIndex % messages.length];
-      result.add((
-        id: _botNotificationBaseId + count,
-        scheduledAt: nextScheduledTime,
-        displayName: msg.displayName,
-        message: msg.message,
-        archetypeId: msg.archetypeId,
-      ));
-
-      messageIndex++;
-      count++;
-      nextScheduledTime = nextScheduledTime.add(const Duration(hours: 24));
+      if (validWeekdays.contains(currentDay.weekday) || validWeekdays.isEmpty) {
+        final msg = messages[messageIndex % messages.length];
+        result.add((
+          id: _botNotificationBaseId + count,
+          scheduledAt: currentDay,
+          displayName: msg.displayName,
+          message: msg.message,
+          archetypeId: msg.archetypeId,
+        ));
+        messageIndex++;
+        count++;
+      }
+      currentDay = currentDay.add(const Duration(days: 1));
     }
 
     return result;

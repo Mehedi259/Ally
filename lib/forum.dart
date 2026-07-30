@@ -50,7 +50,8 @@ class _ForumState extends State<Forum> {
 
   Widget _buildSkeletonList() {
     return ListView.separated(
-      physics: const AlwaysScrollableScrollPhysics(),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
       itemCount: 6,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
@@ -162,12 +163,16 @@ class _ForumState extends State<Forum> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Container(
         color: Colors.black,
-      child: Column(
-        children: [
-          _buildGradientHeader(),
-          _buildSearchBar(),
-          Expanded(
-            child: FutureBuilder<List<ForumPost>?>(
+        height: MediaQuery.of(context).size.height,
+        child: RefreshIndicator(
+          onRefresh: _refreshPosts,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                _buildGradientHeader(),
+                _buildSearchBar(),
+                FutureBuilder<List<ForumPost>?>(
               future: _postsFuture,
               builder: (context, snapshot) {
                 Widget listBody;
@@ -176,7 +181,8 @@ class _ForumState extends State<Forum> {
                   listBody = _buildSkeletonList();
                 } else if (snapshot.hasError) {
                   listBody = ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     children: [
                       const SizedBox(height: 120),
@@ -225,7 +231,8 @@ class _ForumState extends State<Forum> {
 
                   if (posts.isEmpty) {
                     listBody = ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
                       children: const [
                         SizedBox(height: 120),
@@ -283,7 +290,8 @@ class _ForumState extends State<Forum> {
                     }).toList();
 
                     listBody = ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
                       children: [
                         const SizedBox(height: 16),
@@ -308,16 +316,13 @@ class _ForumState extends State<Forum> {
                     );
                   }
                 }
-
-                return RefreshIndicator(
-                  onRefresh: _refreshPosts,
-                  child: listBody,
-                );
+                return listBody;
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+    ),
     ),
     );
   }
