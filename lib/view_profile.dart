@@ -621,7 +621,7 @@ class _ViewProfileState extends State<ViewProfile> {
             const Text(
               'View Profile',
               style: TextStyle(
-                fontSize: 32,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),

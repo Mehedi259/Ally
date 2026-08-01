@@ -401,7 +401,7 @@ class _EditProfileState extends State<EditProfile> {
             const Text(
               'Edit Profile',
               style: TextStyle(
-                fontSize: 32,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
