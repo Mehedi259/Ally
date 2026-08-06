@@ -308,11 +308,21 @@ class Instructions extends StatelessWidget {
                           const SizedBox(height: 8),
                           const Text('Connect with Avea Accountability Partner, Life Coach & Psychic:', style: TextStyle(color: Colors.white70, fontSize: 16)),
                           const SizedBox(height: 4),
-                          const Text(
-                            'www.aveaexperience.com',
-                            style: TextStyle(
-                              color: Color(0xFF00CED1),
-                              fontSize: 16,
+                          GestureDetector(
+                            onTap: () async {
+                              final url = Uri.parse('https://www.aveaexperience.com');
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url, mode: LaunchMode.externalApplication);
+                              }
+                            },
+                            child: const Text(
+                              'www.aveaexperience.com',
+                              style: TextStyle(
+                                color: Color(0xFF00CED1),
+                                fontSize: 16,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Color(0xFF00CED1),
+                              ),
                             ),
                           ),
                         ],
